@@ -1,5 +1,5 @@
 ---
-title: "Mini-Project #01: Fiscal Characteristics of Major US Public Transit Systems. By Cristel Zuniga
+title: "Mini-Project #01: Fiscal Characteristics of Major US Public Transit Systems. By Cristel Zuniga"
 editor: visual
 ---
 
