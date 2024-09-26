@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Mini-Project #01: Fiscal Characteristics of Major US Public Transit Systems.By Cristel Zuniga"
+  description:
+    Course Projects for STA 9750 at Baruch College
+  site-url: "https://<CRISTELKZUNIGA>.github.io/STA9750-2024-FALL/"
+  navbar:
+    background: primary
+    search: false
+    
+format:
+  html:
+    theme: <Lux>
+    toc: false
+---
