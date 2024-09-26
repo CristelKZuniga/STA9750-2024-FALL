@@ -1,5 +1,6 @@
 ---
-title: "Mini-Project #01: Fiscal Characteristics of Major US Public Transit Systems. By Cristel Zuniga"
+title: "Mini-Project #01: Fiscal Characteristics of Major US Public Transit Systems. By Cristel Zuniga
+editor: visual
 ---
 
 # Introduction
@@ -391,8 +392,16 @@ USAGE_AND_FINANCIALS |>
 **3.Which transit system (agency and mode) has the lowest expenses per UPT?**
 
 ```{R}
-USAGE_AND_FINANCIALS\|\> group_by(Agency, Mode) \|\> summarize( total_expenses = sum(Expenses, na.rm = TRUE), total_UPT = sum(UPT, na.rm = TRUE)) \|\> filter(total_UPT \>= 400000) \|\> mutate (expenses_per_UPT = total_expenses/total_UPT)\|\> ungroup() \|\> arrange(expenses_per_UPT) \|\> slice_head(n = 1)
-
+USAGE_AND_FINANCIALS|>
+  group_by(Agency, Mode) |>
+  summarize(
+    total_expenses = sum(Expenses, na.rm = TRUE),
+    total_UPT = sum(UPT, na.rm = TRUE)) |>
+  filter(total_UPT >= 400000) |>
+    mutate (expenses_per_UPT = total_expenses/total_UPT)|>
+  ungroup() |>
+  arrange(expenses_per_UPT) |>
+  slice_head(n = 1)
 ```
 
 *R3. North Carolina State University is the agency with the lowest expenses per UPT, on the bus mode, the expenses per UPT is only \$1.18usdd.*
@@ -417,7 +426,17 @@ USAGE_AND_FINANCIALS|>
 **5.Which transit system (agency and mode) has the lowest expenses per VRM?**
 
 ```{R}
-USAGE_AND_FINANCIALS|>   group_by(Agency, Mode) |>   summarize(     total_expenses = sum(`Expenses\`, na.rm = TRUE), total_VRM = sum(VRM, na.rm = TRUE), total_UPT= sum(UPT, na.rm=TRUE)) \|\> filter(total_UPT \>= 400000) \|\> mutate (total_expenses_per_VRM = total_expenses/total_VRM)\|\> ungroup() \|\> arrange((total_expenses_per_VRM)) \|\> slice_head(n = 1)
+USAGE_AND_FINANCIALS|>
+  group_by(Agency, Mode) |>
+  summarize(
+    total_expenses = sum(`Expenses`, na.rm = TRUE),
+    total_VRM = sum(VRM, na.rm = TRUE),
+    total_UPT= sum(UPT, na.rm=TRUE)) |>
+  filter(total_UPT >= 400000) |>
+  mutate (total_expenses_per_VRM = total_expenses/total_VRM)|>
+  ungroup() |>
+  arrange((total_expenses_per_VRM)) |>
+  slice_head(n = 1)
 
 ```
 
@@ -442,7 +461,7 @@ USAGE_AND_FINANCIALS|>
 
 \``colnames(USAGE_AND_FINANCIALS)`
 
-\#*Conclusion:*
+# *Conclusion:*
 
 The most efficient transit system in the country, in my opinion, is The Transit Authority of Central Kentucky by #Vanpool, which boasts the highest recovery ratio in the country at \$2.38 USD. My basis for declaring this system efficient #is its high recovery cost, as indicated by the ratio, which could lead one to think that this transit #system is profitable. Nevertheless, Vanpool is a mode of transportation that could be slow due to external factors, such as traffic, accidents, and other road conditions.
 
