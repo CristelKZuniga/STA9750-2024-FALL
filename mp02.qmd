@@ -1,0 +1,447 @@
+---
+title: "Mini project 02"
+editor: visual
+---
+
+# Introduction
+
+Welcome to Mini-Project 02. This project aims to recommend successful movies to recreate by analyzing various data sources. We will look at movie ratings, genres, and the involvement of key actors and directors to understand what makes a film successful.
+
+By calculating a success metric based on ratings and audience engagement, we can filter for films that have performed well. The goal is to create a data-driven list of films that have the potential for a successful recreation, ensuring they resonate with audiences.
+
+# Gathering the IMDB Databases
+
+```{r}
+get_imdb_file <- function(fname){
+    BASE_URL <- "https://datasets.imdbws.com/"
+    fname_ext <- paste0(fname, ".tsv.gz")
+    if(!file.exists(fname_ext)){
+        FILE_URL <- paste0(BASE_URL, fname_ext)
+        download.file(FILE_URL, 
+                      destfile = fname_ext)
+    }
+    as.data.frame(readr::read_tsv(fname_ext, lazy=FALSE))
+}
+
+NAME_BASICS      <- get_imdb_file("name.basics")
+
+TITLE_BASICS     <- get_imdb_file("title.basics")
+
+TITLE_EPISODES   <- get_imdb_file("title.episode")
+
+TITLE_RATINGS    <- get_imdb_file("title.ratings")
+
+TITLE_CREW       <- get_imdb_file("title.crew")
+
+TITLE_PRINCIPALS <- get_imdb_file("title.principals")
+
+```
+
+# Data Sub-Sampling
+
+Restricting to people with at least two "know for"credits:
+
+```{r}
+NAME_BASICS <- NAME_BASICS |> filter(str_count(knownForTitles, ",") > 1)
+```
+
+IMDB has a long tail of obscure movies.
+
+```{r}
+
+# Install the ggplot2 package (only need to do this once)
+install.packages("ggplot2")
+library(ggplot2)
+library(scales)
+
+
+TITLE_RATINGS |> ggplot(aes(x=numVotes)) + geom_histogram(bins=30) + xlab("Number of IMDB Ratings") + ylab("Number of Titles") + ggtitle("Majority of IMDB Titles Have Less than 100 Ratings") + theme_bw() + scale_x_log10(label=scales::comma) + scale_y_continuous(label=scales::comma)
+
+```
+
+Throw out any tittle less than 100 ratings.
+
+```{r}
+TITLE_RATINGS |> pull(numVotes) |> quantile()
+
+```
+
+Reducing the size of the datasetes.
+
+```{r}
+TITLE_RATINGS <- TITLE_RATINGS |> filter(numVotes >= 100)
+```
+
+Applying filters with semi_join which returns only values which have match and doesn't add columns
+
+```{r}
+TITLE_EPISODES_1 <- TITLE_EPISODES |> semi_join(TITLE_RATINGS, join_by(tconst == tconst))
+TITLE_EPISODES_2 <- TITLE_EPISODES |> semi_join(TITLE_RATINGS, join_by(parentTconst == tconst))
+
+```
+
+# Initial exploration
+
+Cleaning the NAMES_BASIC command
+
+```{r}
+NAME_BASICS <- NAME_BASICS |> mutate(birthYear = as.numeric(birthYear), deathYear = as.numeric(deathYear))
+
+head (NAME_BASICS)
+```
+
+## Task 1: Column Type Correction
+
+Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical.
+
+```{r}
+head (TITLE_BASICS)
+```
+
+a)  Getting data types for each data set, to evaulate which information needs to be updated with the coercion functions.
+
+```{r}
+str (TITLE_BASICS) 
+str (TITLE_EPISODES)
+str (TITLE_RATINGS)
+str (TITLE_CREW)
+str (TITLE_PRINCIPALS)
+```
+
+b)  Replacing "N" with NA before executinf the Coercion functions
+
+```{r}
+TITLE_BASICS[TITLE_BASICS == "N"] <- NA 
+TITLE_EPISODES[TITLE_EPISODES == "N"] <- NA 
+TITLE_RATINGS[TITLE_RATINGS == "N"] <- NA 
+TITLE_CREW[TITLE_CREW == "N"] <- NA 
+TITLE_PRINCIPALS[TITLE_PRINCIPALS == "N"] <- NA
+
+head (TITLE_BASICS)
+```
+
+C: Using a combination of mutate and the coercion functions as.numeric and as.logical.
+
+```{r}
+TITLE_BASICS <- TITLE_BASICS |> mutate(isAdult = as.logical(isAdult), startYear = as.numeric(startYear), endYear = as.numeric(endYear), runtimeMinutes = as.numeric(runtimeMinutes))
+
+str (TITLE_BASICS)
+
+TITLE_EPISODES <- TITLE_EPISODES |> mutate(seasonNumber = as.numeric(seasonNumber), episodeNumber = as.numeric(episodeNumber))
+
+str (TITLE_EPISODES)
+
+glimpse(NAME_BASICS) 
+install.packages("tidyr") 
+library(tidyr)
+
+NAME_BASICS |> separate_longer_delim(knownForTitles, ",") |> slice_head(n=10)
+```
+
+## Task 2: Instructor provided questions
+
+1.  How many movies are in our data set? How many TV series? How many TV episodes?
+
+With the following code you will fin the count for all the Types availables in the dataset in descendent order:
+
+```{r}
+TITLE_BASICS|> count (titleType)|>arrange(desc(n))
+```
+
+Movies = 132,320 TV Series= 30,013 TV Episodes = 156,860
+
+Now, we're filtering to get the count for the 3 specific types requested:
+
+```{r}
+filtered_data <- TITLE_BASICS |> filter(titleType %in% c("movie", "tvSeries", "tvEpisode"))
+
+filtered_data |> ggplot(aes(x = titleType)) + geom_bar() + xlab("Title Types") + ylab("Number of Titles") + ggtitle("Number of Types per Titles") + theme_bw() + scale_x_discrete() + scale_y_continuous(labels = scales::comma)
+  
+```
+
+2.Who is the oldest living person in our data set?
+
+For this question, we will analyze two different scenarios.
+
+Scenario 1: We'll calculate the Äge, assuming that NA is a missing value, so we're excluding those rows.
+
+```{r}
+NAME_BASICS <- NAME_BASICS |> mutate(age = ifelse(!is.na(deathYear) & !is.na(birthYear), deathYear - birthYear, NA)) |>arrange(desc(10))
+```
+
+Then, we'll arrange by the oldest person by age,having the year of death.
+
+Under this analysis, the oldest person alive was: Jeanne Louis Calment, who died at 122 years old.
+
+```{r}
+NAME_BASICS |> arrange(desc(age)) |> select(primaryName, birthYear, deathYear, age) |> head() |> print()
+```
+
+Scenario 2: Assuming that the NA values on year of death are missing because the person is still alive, then we'll use the following code to calculate the age.
+
+```{r}
+current_year <- 2024 NAME_BASICS |> mutate(age = ifelse(!is.na(deathYear), deathYear - birthYear, current_year - birthYear)) |> arrange(desc(age)) |> select(primaryName, birthYear, deathYear, age)|> head()|> print()
+```
+
+As we can see, under this scenario, we can't take the results as possible answers, because it's impossible that a person can live for 399 years.
+
+3.There is one TV Episode in this data set with a perfect 10/10 rating and at least 200,000 IMDb ratings. What is it? What series does it belong to?
+
+With the following code we will filter by the tittle with a 10/10 ranking and equal or more than 200,00 votes: We knot that the title ID number is: "tt2301451", now we need to identify the title name on the table "TABLE_BASICS".
+
+```{r}
+
+TITLE_RATINGS |> arrange(desc(averageRating)) |> filter(numVotes >= 200000) |> select(tconst, averageRating, numVotes) |> head() |> print()
+
+TITLE_BASICS |> filter (tconst == "tt2301451")|> select (tconst, titleType, primaryTitle)
+
+TITLE_EPISODES |> filter (tconst == "tt2301451")|> select (tconst, seasonNumber, episodeNumber)
+```
+
+The TV Episode with the perfect ranking and 230,087 votes is the episode number 14, of season 5 from the TV Series called "Ozymandias".
+
+4.What four projects is the actor Mark Hamill most known for?
+
+```{r}
+NAME_BASICS |> filter (primaryName == "Mark Hamill")|> select (primaryName, knownForTitles)
+
+library(dplyr)
+
+TITLE_BASICS |> filter(tconst %in% c("tt0076759", "tt2527336", "tt0080684", "tt0086190")) |> select(tconst, titleType, primaryTitle) |> print()
+```
+
+The actor Mark Hamill is most known for the Star Wars movies, these are the primary titles:
+
+5.What TV series, with more than 12 episodes, has the highest average rating?
+
+```{r}
+episode_ratings <- TITLE_EPISODES |> inner_join(TITLE_RATINGS, by = "tconst") |> inner_join(TITLE_BASICS, by = c("parentTconst" = "tconst"))
+
+# Count episodes per series and filter for series with more than 12 episodes
+
+top_rated_series <- episode_ratings |> group_by(parentTconst, primaryTitle) |> summarise( avg_rating = mean(averageRating, na.rm = TRUE), num_episodes = n(), .groups = "drop" ) |> filter(num_episodes > 12) |> arrange(desc(avg_rating))|> head (1) message <- sprintf( "TV series with the highest average rating is %s with an average rating of %.2f across %d episodes.", top_rated_series$primaryTitle,
+    top_rated_series$avg_rating, top_rated_series$num_episodes ) cat(message)
+```
+
+6.The TV series Happy Days (1974-1984) gives us the common idiom “jump the shark”. The phrase comes from a controversial fifth season episode (aired in 1977) in which a lead character literally jumped over a shark on water skis. Idiomatically, it is used to refer to the moment when a once-great show becomes ridiculous and rapidly looses quality.
+
+Is it true that episodes from later seasons of Happy Days have lower average ratings than the early seasons?
+
+R= Yes, it's true that the later episodes have a lower average rating.
+
+```{r}
+happy_days <- TITLE_BASICS |> filter(primaryTitle == "Happy Days")
+
+happy_days_ratings <- TITLE_EPISODES |> filter(parentTconst %in% happy_days$tconst) |> inner_join(TITLE_RATINGS, by = "tconst") |> group_by(seasonNumber) |> summarise(avg_rating = mean(averageRating, na.rm = TRUE)) |> arrange(seasonNumber)
+
+print(happy_days_ratings)
+```
+
+# Quantifying Success
+
+## Task 3: Customs Success Metric
+
+Designing a metric for IMDb entries, which reflects the quality and popular awareness. Our success metric will utilize the "log" function for "numVotes" variable, the function will help to balance the large vote counts and will give more veracity to the results.
+
+The following is the code for the success metric:
+
+```{r}
+TITLE_RATINGS |> mutate(successMetric = averageRating * log(numVotes)) |> select(successMetric, averageRating, numVotes, tconst) |> head(10)
+
+```
+
+Time to validate the success metric:
+
+1.  In the following code, we'll choose the top 10 movies and confirm that they were indeed box offices successes.
+
+```{r}
+inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(titleType == "movie") |> select(successMetric, titleType, tconst,primaryTitle, averageRating, numVotes) |> arrange(desc(successMetric)) |> head(10)
+
+```
+
+In the code above, we're analyzing the information with the success metric that we created,now we'll make a comparative by analyzing only the average rating:
+
+```{r}
+inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(titleType == "movie") |> select(successMetric, titleType, tconst,primaryTitle, averageRating, numVotes) |> arrange(desc(averageRating)) |> head(10)
+
+```
+
+Now, let’s discuss the results. Sorting by the average rating doesn’t feel reliable because even though those movies are rated with a 10, the number of votes is too low. In contrast, the results obtained with the success metric show a higher number of votes, which is directly proportional to both the rating and the success metric points.
+
+2.  Choose 3-5 movies with large numbers of IMDb votes that score poorly on your success metric and confirm that they are indeed of low quality.
+
+For this analysis, first I want to know the mean, max and min of my three variables, in my code I'm filtering for number of votes above 15,000 and success metric under the average.
+
+```{r}
+TITLE_RATINGS |> summarise(min_averageRating = mean(averageRating, na.rm = TRUE))
+
+TITLE_RATINGS |> summarise(mean_numVotesg = mean(numVotes, na.rn = TRUE))
+
+TITLE_RATINGS |> summarise(mean_numSuccessMetric = mean(successMetric, is.na = TRUE))
+
+TITLE_RATINGS |> summarise(max_numSuccessMetric = max(successMetric, is.na = TRUE))
+
+TITLE_RATINGS |> summarise(min_numSuccessMetric = min(successMetric, na.rm = TRUE))
+
+inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(titleType == "movie", numVotes > 15000, successMetric < 42) |> select(successMetric, titleType, tconst, primaryTitle, averageRating, numVotes) |> head(10)
+```
+
+As we can see in the results, all the movies where the success metric is below average have a low average rating as well. Even though the number of votes is high, we demonstrate again that the success metric works.
+
+3.  Choose a prestige actor or director and confirm that they have many projects with high scores on your success metric. The chosen director is Woody Allen, who has been awarded 4 Oscars, 2 Golden Globes, 9 BAFTA nominations, and many more nominations throughout his career.
+
+```{r}
+NAME_BASICS |> filter (primaryName == "Woody Allen") #We use this filter to get the project IDs
+
+inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(titleType == "movie", tconst %in% c("tt0079522","tt0075686","tt0118954","tt0091167")) |> select(successMetric, titleType, tconst, primaryTitle, averageRating, numVotes)
+
+```
+
+Per the results, his movies exceed the average success metric. However, the average rating is not great. It’s important to highlight that we chose this actor based on his awards, but those awarded movies are not in this database. This can be considered missing data, and consequently, these results are not very reliable.
+
+4.  Perform at least one other form of ‘spot check’ validation.
+
+We'll create a scatter plot to visualize the relationship between the Success Metric and the Number of Votes per movie.
+
+```{r}
+library(ggplot2)
+
+ggplot(inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) , aes(x = numVotes, y = successMetric)) + geom_point() + labs(title = "Success Metric vs. Number of Votes", x = "Number of Votes", y = "Success Metric") + scale_x_continuous(labels = label_number(accuracy = 0.1)) + theme_minimal()
+```
+
+The results of this plot confirm that the relationship between the number of votes and the success metric is not necessarily close. We must remember that we used the “log” function to precisely avoid distorting the calculations by the count of votes. We can also observe that the largest concentration of the highest ratings is between 0 and 1 million votes.An interesting observation would be to know which two movies have the highest ratings and the highest number of votes, in this plot.
+
+5.  Come up with a numerical threshold for a project to be a ‘success’; that is, determine a value such that movies above are all “solid” or better.
+
+I will use Percentiles to calculate the numerical threshold. The reason I choose this method is because i think it's important to focus on the successMetric value where most of the data is locates. Given that our data contains extreme values, using the Percentiles helps to prevent skewing the numeric threshold. In contrast, the mean can be significantly influenced by these extreme values.
+
+```{r}
+mean(TITLE_RATINGS$successMetric, na.rm = TRUE)
+
+min(TITLE_RATINGS$successMetric, na.rm = TRUE)
+
+max(TITLE_RATINGS$successMetric, na.rm = TRUE)
+```
+
+Calculate percentiles
+
+```{r}
+percentiles <- quantile(TITLE_RATINGS$successMetric, probs = c(0.25, 0.75), na.rm = TRUE) print(percentiles)
+```
+
+The results indicate that 75% of the success metric scores are 49 or lower, and 25% of the scores are 33 or lower. Consequently, I will set 50 as the numeric threshold to project a successful or solid project.
+
+# Examining success by Genre and Decade.
+
+1.  What was the genre with the most “successes” in each decade?
+
+To calculate the counts of success by genres in each decade:
+
+```{r}
+inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes), decade = floor(startYear / 10) * 10) |>
+filter(successMetric > 50) |> group_by(decade, genres) |>
+summarise( count_successes = n(),
+avg_rating = mean(averageRating, na.rm = TRUE), total_votes = sum(numVotes) ) |> slice_max(count_successes, n = 1, with_ties = FALSE) |> #Get the genre with the most successes in each decade arrange (desc(decade))
+```
+
+The most successful genres in the past 30 years have been action, adventure, and animation. It is interesting how, in the 1940s when the Second World War took place, the most successful genres were animation, comedy, and family. It makes sense that producers were interested in these genres since movies were a way to entertain civilians and help keep them distracted with more positive content. In the following decades, comedy gained popularity, even though the average rating wasn’t great.
+
+2.  Now I'll continue to analyze in a deeper level only the last 5 years, for movies and TV series, and we will filter the top 3 genres per year.
+
+```{r}
+success_past_10_years <- inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(successMetric > 50, titleType %in% c("movie", "tvSeries"), startYear >= 2019, startYear <= 2024) |> group_by(startYear, genres) |>
+summarise( count_successes = n(),
+avg_rating = mean(averageRating, na.rm = TRUE), total_votes = sum(numVotes) ) |> group_by(startYear) |>
+slice_max(order_by = count_successes, n = 3, with_ties = FALSE) |> arrange(startYear, desc(count_successes)) success_past_10_years|>print (n=Inf)
+DT :: data.table()
+```
+
+Heatmap of Genre Successes from 2019-2024:
+
+```{r}
+ggplot(success_past_10_years, aes(x = startYear, y = genres, fill = count_successes)) + geom_tile() + labs(title = "Heatmap of Genre Successes (2019-2024)", x = "Year", y = "Genre") + scale_fill_gradient(low = "white", high = "blue") + theme_minimal()
+```
+
+As we can appreciate in the heatmap, drama has been the most successful genre over the past 5 years. In second place is a combination of comedy and drama, followed by documentaries. I feel very pleased with these results since comedy and drama are my favorite genres, and I was originally thinking of a suggestion within these two genres.
+
+3.  Finally I want to analyze the average rating of the most successful movies and TV series from the past 5 years per genre.
+
+This is the same code as before, but now we're dorping thae group by function, since we don't need the information grouped by year.
+
+```{r}
+success_past_10_years <- inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(successMetric > 50, titleType %in% c("movie", "tvSeries"), startYear >= 2019, startYear <= 2024) |> group_by(startYear, genres) |>
+summarise( count_successes = n(),
+avg_rating = mean(averageRating, na.rm = TRUE), total_votes = sum(numVotes), .groups = "drop" ) |> group_by(startYear) |>
+slice_max(order_by = count_successes, n = 3, with_ties = FALSE) |> arrange(startYear, desc(count_successes))
+```
+
+In the following code we'll get the average rating and the total successes per genre of the last 5 years.
+
+```{r}
+average_genre_ratings <- success_past_10_years |> group_by(genres) |>
+summarise( total_avg_rating = mean(avg_rating, na.rm = TRUE), total_successes = sum(count_successes), .groups = "drop" ) |> arrange(desc(total_avg_rating))
+average_genre_ratings |> print(n = Inf)
+```
+
+Bar Plot of the Average Ratings per Genre from 2019 - 2024
+
+```{r}
+ggplot(average_genre_ratings, aes(x = reorder(genres, overall_avg_rating), y = overall_avg_rating)) + geom_bar(stat = "identity", fill = "steelblue") + labs(title = "Average Ratings of Genres (2019-2024)", x = "Genres", y = "Average Rating") + theme_minimal() +
+coord_flip()
+```
+
+It’s interesting how, even though these are the top 5 most successful genres from recent years, the ratings are not great. This suggests a significant opportunity to produce a great movie, as it seems the public’s expectations are not very high.
+
+# Successful Personnel in the Genre
+
+In this code I want to find the successful actors and directors by genre:
+
+```{r}
+success_threshold <- 50 # Adjust this value based on your metric
+
+#Join TITLE_BASICS with TITLE_RATINGS to get successful titles
+
+successful_titles <- TITLE_BASICS |> inner_join(TITLE_RATINGS, by = "tconst") |> filter(successMetric > success_threshold) |> select(tconst, genres) # Include the genre column
+
+#Get actors and directors with at least 1 successful title 
+
+actors_and_directors <- NAME_BASICS |> inner_join(TITLE_PRINCIPALS, by = "nconst") |> filter(primaryProfession %in% c("actor", "actress", "director")) |> inner_join(successful_titles, by = "tconst") |> group_by(primaryName, primaryProfession, genres) |> summarise(knowForTitles = paste(unique(tconst), collapse = ", "), .groups = "drop") |> filter(n() > 0) # Ensure there is at least 1 successful title
+
+#Select the top 2 actors and 1 director 
+
+top_actors <- actors_and_directors |> filter(primaryProfession %in% c("actor", "actress")) |> top_n(2, wt = n())
+
+top_director <- actors_and_directors |> filter(primaryProfession == "director") |> top_n(1, wt = n())
+
+#Combine top actors and director
+
+result <- bind_rows(top_actors, top_director)
+
+final_result <- result |> select(primaryName, primaryProfession, knowForTitles, genres) print(final_result)
+```
+
+Now I want to filter by Comedy and Drama Genre only:
+
+```{r}
+
+filtered_result <- final_result |> filter(genres %in% c("Comedy,Drama", "Comedy", "Drama))
+
+print(filtered_result)
+```
+
+Last step is once I have made my research in IMDB as well, I want to search in these list some autors and directors that I'll like to work with.
+
+```{r}
+# List of names to find
+
+names_to_find <- c("Anthony Hopkins", "Eddie Murphy", "Daniel Day-Lewis", "Dustin Hoffman", "Morgan Freeman", "Guillermo Del Toro") # Replace with actual names
+
+# Filter the filtered_result for specific names
+
+specific_names_result <- filtered_result |> filter(primaryName %in% names_to_find)
+
+# Print the results
+
+print(specific_names_result)
+
+```
