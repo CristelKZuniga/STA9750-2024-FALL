@@ -12,6 +12,12 @@ By calculating a success metric based on ratings and audience engagement, we can
 # Gathering the IMDB Databases
 
 ```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+```
+
+
+```{r}
 get_imdb_file <- function(fname){
     BASE_URL <- "https://datasets.imdbws.com/"
     fname_ext <- paste0(fname, ".tsv.gz")
@@ -41,9 +47,6 @@ TITLE_PRINCIPALS <- get_imdb_file("title.principals")
 
 Restricting to people with at least two "know for"credits:
 
-```{r}
-NAME_BASICS <- NAME_BASICS |> filter(str_count(knownForTitles, ",") > 1)
-```
 
 IMDB has a long tail of obscure movies.
 
@@ -62,6 +65,9 @@ TITLE_RATINGS |> ggplot(aes(x=numVotes)) + geom_histogram(bins=30) + xlab("Numbe
 Throw out any tittle less than 100 ratings.
 
 ```{r}
+
+install.packages("dplyr")
+library(dplyr)
 TITLE_RATINGS |> pull(numVotes) |> quantile()
 
 ```
@@ -180,7 +186,17 @@ NAME_BASICS |> arrange(desc(age)) |> select(primaryName, birthYear, deathYear, a
 Scenario 2: Assuming that the NA values on year of death are missing because the person is still alive, then we'll use the following code to calculate the age.
 
 ```{r}
-current_year <- 2024 NAME_BASICS |> mutate(age = ifelse(!is.na(deathYear), deathYear - birthYear, current_year - birthYear)) |> arrange(desc(age)) |> select(primaryName, birthYear, deathYear, age)|> head()|> print()
+
+current_year <- 2024 
+
+NAME_BASICS |> 
+  mutate(age = ifelse(!is.na(deathYear), deathYear - birthYear, current_year - birthYear)) |> 
+  arrange(desc(age)) |> 
+  select(primaryName, birthYear, deathYear, age) |> 
+  head() |> 
+  print()
+
+
 ```
 
 As we can see, under this scenario, we can't take the results as possible answers, because it's impossible that a person can live for 399 years.
@@ -219,8 +235,27 @@ episode_ratings <- TITLE_EPISODES |> inner_join(TITLE_RATINGS, by = "tconst") |>
 
 # Count episodes per series and filter for series with more than 12 episodes
 
-top_rated_series <- episode_ratings |> group_by(parentTconst, primaryTitle) |> summarise( avg_rating = mean(averageRating, na.rm = TRUE), num_episodes = n(), .groups = "drop" ) |> filter(num_episodes > 12) |> arrange(desc(avg_rating))|> head (1) message <- sprintf( "TV series with the highest average rating is %s with an average rating of %.2f across %d episodes.", top_rated_series$primaryTitle,
-    top_rated_series$avg_rating, top_rated_series$num_episodes ) cat(message)
+
+top_rated_series <- episode_ratings |> 
+  group_by(parentTconst, primaryTitle) |> 
+  summarise(avg_rating = mean(averageRating, na.rm = TRUE), 
+            num_episodes = n(), 
+            .groups = "drop") |> 
+  filter(num_episodes > 12) |> 
+  arrange(desc(avg_rating)) |> 
+  head(1)
+
+
+message <- sprintf(
+  "TV series with the highest average rating is '%s' with an average rating of %.2f across %d episodes.",
+  top_rated_series$primaryTitle,
+  top_rated_series$avg_rating,
+  top_rated_series$num_episodes
+)
+print(message)
+
+
+
 ```
 
 6.The TV series Happy Days (1974-1984) gives us the common idiom “jump the shark”. The phrase comes from a controversial fifth season episode (aired in 1977) in which a lead character literally jumped over a shark on water skis. Idiomatically, it is used to refer to the moment when a once-great show becomes ridiculous and rapidly looses quality.
@@ -262,6 +297,7 @@ inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(suc
 In the code above, we're analyzing the information with the success metric that we created,now we'll make a comparative by analyzing only the average rating:
 
 ```{r}
+
 inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(titleType == "movie") |> select(successMetric, titleType, tconst,primaryTitle, averageRating, numVotes) |> arrange(desc(averageRating)) |> head(10)
 
 ```
@@ -273,15 +309,17 @@ Now, let’s discuss the results. Sorting by the average rating doesn’t feel r
 For this analysis, first I want to know the mean, max and min of my three variables, in my code I'm filtering for number of votes above 15,000 and success metric under the average.
 
 ```{r}
+
+TITLE_RATINGS |> mutate(successMetric = averageRating * log(numVotes)) |> select(successMetric, averageRating, numVotes, tconst) |> head(10)
 TITLE_RATINGS |> summarise(min_averageRating = mean(averageRating, na.rm = TRUE))
 
 TITLE_RATINGS |> summarise(mean_numVotesg = mean(numVotes, na.rn = TRUE))
 
-TITLE_RATINGS |> summarise(mean_numSuccessMetric = mean(successMetric, is.na = TRUE))
+TITLE_RATINGS |> mutate(successMetric = averageRating * log(numVotes)) |> select(successMetric, averageRating, numVotes, tconst) |> head(10)|> summarise(mean_numSuccessMetric = mean(successMetric, is.na = TRUE))
 
-TITLE_RATINGS |> summarise(max_numSuccessMetric = max(successMetric, is.na = TRUE))
+TITLE_RATINGS |> mutate(successMetric = averageRating * log(numVotes)) |> select(successMetric, averageRating, numVotes, tconst) |> head(10)|> summarise(max_numSuccessMetric = max(successMetric, is.na = TRUE))
 
-TITLE_RATINGS |> summarise(min_numSuccessMetric = min(successMetric, na.rm = TRUE))
+TITLE_RATINGS |> mutate(successMetric = averageRating * log(numVotes)) |> select(successMetric, averageRating, numVotes, tconst) |> head(10)|> summarise(min_numSuccessMetric = min(successMetric, na.rm = TRUE))
 
 inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(titleType == "movie", numVotes > 15000, successMetric < 42) |> select(successMetric, titleType, tconst, primaryTitle, averageRating, numVotes) |> head(10)
 ```
@@ -306,7 +344,20 @@ We'll create a scatter plot to visualize the relationship between the Success Me
 ```{r}
 library(ggplot2)
 
-ggplot(inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) , aes(x = numVotes, y = successMetric)) + geom_point() + labs(title = "Success Metric vs. Number of Votes", x = "Number of Votes", y = "Success Metric") + scale_x_continuous(labels = label_number(accuracy = 0.1)) + theme_minimal()
+TITLE_RATINGS <- TITLE_RATINGS |> 
+  mutate(successMetric = averageRating * log(numVotes)) 
+
+
+ggplot(inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) , 
+       aes(x = numVotes, y = successMetric)) + 
+  geom_point() + 
+  labs(title = "Success Metric vs. Number of Votes", 
+       x = "Number of Votes", 
+       y = "Success Metric") + 
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) + 
+  theme_minimal()
+
+
 ```
 
 The results of this plot confirm that the relationship between the number of votes and the success metric is not necessarily close. We must remember that we used the “log” function to precisely avoid distorting the calculations by the count of votes. We can also observe that the largest concentration of the highest ratings is between 0 and 1 million votes.An interesting observation would be to know which two movies have the highest ratings and the highest number of votes, in this plot.
@@ -325,8 +376,11 @@ max(TITLE_RATINGS$successMetric, na.rm = TRUE)
 
 Calculate percentiles
 
+
 ```{r}
-percentiles <- quantile(TITLE_RATINGS$successMetric, probs = c(0.25, 0.75), na.rm = TRUE) print(percentiles)
+percentiles <- quantile(TITLE_RATINGS$successMetric, probs = c(0.25, 0.75), na.rm = TRUE); print(percentiles)
+
+
 ```
 
 The results indicate that 75% of the success metric scores are 49 or lower, and 25% of the scores are 33 or lower. Consequently, I will set 50 as the numeric threshold to project a successful or solid project.
@@ -338,10 +392,22 @@ The results indicate that 75% of the success metric scores are 49 or lower, and 
 To calculate the counts of success by genres in each decade:
 
 ```{r}
-inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes), decade = floor(startYear / 10) * 10) |>
-filter(successMetric > 50) |> group_by(decade, genres) |>
-summarise( count_successes = n(),
-avg_rating = mean(averageRating, na.rm = TRUE), total_votes = sum(numVotes) ) |> slice_max(count_successes, n = 1, with_ties = FALSE) |> #Get the genre with the most successes in each decade arrange (desc(decade))
+
+inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> 
+  mutate(successMetric = averageRating * log(numVotes), 
+         decade = floor(startYear / 10) * 10) |> 
+  filter(successMetric > 50) |> 
+  group_by(decade, genres) |> 
+  summarise(
+    count_successes = n(),
+    avg_rating = mean(averageRating, na.rm = TRUE), 
+    total_votes = sum(numVotes)
+  ) |> 
+  # Get the genre with the most successes in each decade
+  slice_max(count_successes, n = 1, with_ties = FALSE) |> 
+  arrange(desc(decade))
+
+
 ```
 
 The most successful genres in the past 30 years have been action, adventure, and animation. It is interesting how, in the 1940s when the Second World War took place, the most successful genres were animation, comedy, and family. It makes sense that producers were interested in these genres since movies were a way to entertain civilians and help keep them distracted with more positive content. In the following decades, comedy gained popularity, even though the average rating wasn’t great.
@@ -349,11 +415,24 @@ The most successful genres in the past 30 years have been action, adventure, and
 2.  Now I'll continue to analyze in a deeper level only the last 5 years, for movies and TV series, and we will filter the top 3 genres per year.
 
 ```{r}
-success_past_10_years <- inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> mutate(successMetric = averageRating * log(numVotes)) |> filter(successMetric > 50, titleType %in% c("movie", "tvSeries"), startYear >= 2019, startYear <= 2024) |> group_by(startYear, genres) |>
-summarise( count_successes = n(),
-avg_rating = mean(averageRating, na.rm = TRUE), total_votes = sum(numVotes) ) |> group_by(startYear) |>
-slice_max(order_by = count_successes, n = 3, with_ties = FALSE) |> arrange(startYear, desc(count_successes)) success_past_10_years|>print (n=Inf)
-DT :: data.table()
+success_past_10_years <- inner_join(TITLE_RATINGS, TITLE_BASICS, join_by(tconst == tconst)) |> 
+  mutate(successMetric = averageRating * log(numVotes)) |> 
+  filter(successMetric > 50, 
+         titleType %in% c("movie", "tvSeries"), 
+         startYear >= 2019, startYear <= 2024) |> 
+  group_by(startYear, genres) |> 
+  summarise(
+    count_successes = n(),
+    avg_rating = mean(averageRating, na.rm = TRUE), 
+    total_votes = sum(numVotes)
+  ) |> 
+  group_by(startYear) |> 
+  slice_max(order_by = count_successes, n = 3, with_ties = FALSE) |> 
+  arrange(startYear, desc(count_successes))
+
+# Print the results with no row limit
+success_past_10_years |> print(n = Inf)
+
 ```
 
 Heatmap of Genre Successes from 2019-2024:
@@ -386,62 +465,196 @@ average_genre_ratings |> print(n = Inf)
 Bar Plot of the Average Ratings per Genre from 2019 - 2024
 
 ```{r}
-ggplot(average_genre_ratings, aes(x = reorder(genres, overall_avg_rating), y = overall_avg_rating)) + geom_bar(stat = "identity", fill = "steelblue") + labs(title = "Average Ratings of Genres (2019-2024)", x = "Genres", y = "Average Rating") + theme_minimal() +
-coord_flip()
+# Calculate average ratings and total successes for each genre
+average_genre_ratings <- success_past_10_years |> 
+  group_by(genres) |> 
+  summarise(
+    total_avg_rating = mean(avg_rating, na.rm = TRUE), 
+    total_successes = sum(count_successes), 
+    .groups = "drop"
+  ) |> 
+  arrange(desc(total_avg_rating))
+average_genre_ratings |> print(n = Inf)
+
+# Plot the results with the correct column names
+ggplot(average_genre_ratings, aes(x = reorder(genres, total_avg_rating), y = total_avg_rating)) + 
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  labs(title = "Average Ratings of Genres (2019-2024)", x = "Genres", y = "Average Rating") + 
+  theme_minimal() + 
+  coord_flip()
+
+
 ```
 
 It’s interesting how, even though these are the top 5 most successful genres from recent years, the ratings are not great. This suggests a significant opportunity to produce a great movie, as it seems the public’s expectations are not very high.
 
 # Successful Personnel in the Genre
 
-In this code I want to find the successful actors and directors by genre:
+I need to load all the datasets again: 
 
 ```{r}
-success_threshold <- 50 # Adjust this value based on your metric
+get_imdb_file <- function(fname){
+    BASE_URL <- "https://datasets.imdbws.com/"
+    fname_ext <- paste0(fname, ".tsv.gz")
+    
+    # Check if the file exists locally
+    if (!file.exists(fname_ext)) {
+        FILE_URL <- paste0(BASE_URL, fname_ext)
+        download.file(FILE_URL, destfile = fname_ext)
+    } 
+    
+    # Read the data into a dataframe
+    return(as.data.frame(readr::read_tsv(fname_ext, lazy = FALSE)))
+}
 
-#Join TITLE_BASICS with TITLE_RATINGS to get successful titles
+# Load the datasets, they will only be downloaded if not already present
+NAME_BASICS      <- get_imdb_file("name.basics")
+TITLE_BASICS     <- get_imdb_file("title.basics")
+TITLE_EPISODES   <- get_imdb_file("title.episode")
+TITLE_RATINGS    <- get_imdb_file("title.ratings")
+TITLE_CREW       <- get_imdb_file("title.crew")
+TITLE_PRINCIPALS <- get_imdb_file("title.principals")
 
-successful_titles <- TITLE_BASICS |> inner_join(TITLE_RATINGS, by = "tconst") |> filter(successMetric > success_threshold) |> select(tconst, genres) # Include the genre column
-
-#Get actors and directors with at least 1 successful title 
-
-actors_and_directors <- NAME_BASICS |> inner_join(TITLE_PRINCIPALS, by = "nconst") |> filter(primaryProfession %in% c("actor", "actress", "director")) |> inner_join(successful_titles, by = "tconst") |> group_by(primaryName, primaryProfession, genres) |> summarise(knowForTitles = paste(unique(tconst), collapse = ", "), .groups = "drop") |> filter(n() > 0) # Ensure there is at least 1 successful title
-
-#Select the top 2 actors and 1 director 
-
-top_actors <- actors_and_directors |> filter(primaryProfession %in% c("actor", "actress")) |> top_n(2, wt = n())
-
-top_director <- actors_and_directors |> filter(primaryProfession == "director") |> top_n(1, wt = n())
-
-#Combine top actors and director
-
-result <- bind_rows(top_actors, top_director)
-
-final_result <- result |> select(primaryName, primaryProfession, knowForTitles, genres) print(final_result)
 ```
 
-Now I want to filter by Comedy and Drama Genre only:
+In this code, we’ll filter by actors, actresses, and directors with previous successful projects.
 
 ```{r}
 
-filtered_result <- final_result |> filter(genres %in% c("Comedy,Drama", "Comedy", "Drama))
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+    install.packages("dplyr")
+}
+   
 
-print(filtered_result)
+success_threshold <- 50  
+
+TITLE_RATINGS <- TITLE_RATINGS |>
+  mutate(successMetric = averageRating * log(numVotes)) |>
+  select(successMetric, averageRating, numVotes, tconst)
+
+
+successful_people <- TITLE_PRINCIPALS |>
+  inner_join(TITLE_RATINGS, by = "tconst") |>
+  filter(category %in% c("actor", "actress", "director"), successMetric > success_threshold) |>
+  group_by(nconst, category) |>
+  summarise(
+    num_successful_movies = n(),
+    avg_success_metric = mean(successMetric, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  inner_join(NAME_BASICS, by = "nconst") |>
+  arrange(desc(num_successful_movies))
+
+
 ```
 
-Last step is once I have made my research in IMDB as well, I want to search in these list some autors and directors that I'll like to work with.
 
 ```{r}
-# List of names to find
 
-names_to_find <- c("Anthony Hopkins", "Eddie Murphy", "Daniel Day-Lewis", "Dustin Hoffman", "Morgan Freeman", "Guillermo Del Toro") # Replace with actual names
+success_threshold <- 50  
 
-# Filter the filtered_result for specific names
+# Identify successful actors and directors
+successful_people <- TITLE_PRINCIPALS |>
+  inner_join(TITLE_RATINGS, by = "tconst") |>
+  filter(category %in% c("actor", "actress", "director"), successMetric > success_threshold) |>
+  group_by(nconst, category) |>
+  summarise(
+    num_successful_movies = n(),
+    avg_success_metric = mean(successMetric, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  inner_join(NAME_BASICS, by = "nconst") |>
+  arrange(desc(num_successful_movies))
 
-specific_names_result <- filtered_result |> filter(primaryName %in% names_to_find)
+# Select actors and director
+top_actors_director <- successful_people |>
+  filter(category %in% c("actor", "actress", "director")) |>
+  slice_head(n = 25)  
 
-# Print the results
+top_actors_director |> select(primaryName, category, num_successful_movies, avg_success_metric)
 
-print(specific_names_result)
+filtered_actors_director <- top_actors_director |>
+  inner_join(TITLE_PRINCIPALS, by = "nconst") |>
+  inner_join(TITLE_BASICS, by = "tconst") |>
+  filter(genres %in% c("Comedy", "Drama", "Comedy,Drama", "Romance")) |>
+  select(primaryName, num_successful_movies, avg_success_metric, genres)
+
+filtered_actors_director
 
 ```
+
+The actors two actors that we'll choose for this remake will be: Seth MacFarlane and Hank Azaria. 
+
+*Seth MacFarlane* is Known for pushing boundaries with humor and storytelling, blending satire with social commentary.Has successfully transitioned into live-action, starring in and producing the sci-fi series The Orville.
+
+*Hank Azaria*, is renowned for his ability to create distinct, memorable character voices, contributing to the long-standing success of The Simpsons.Actively involved in philanthropic efforts, including advocacy for various social and environmental causes.
+
+The director choosen for this project will be *Guillermo Del Toro*, Frequently explores themes of love, loss, and the struggle between good and evil, his ability to blend genres and create emotional depth in fantastical narratives has earned him a dedicated fan base and numerous awards. 
+
+The impressive ratings highlight the potential of these talented individuals, each of whom brings their own unique and prestigious skills to the table. Together, they are poised for tremendous success.
+
+# Nostalgia and Remakes
+
+Now we need a story! We wish to produce a remark of______ 
+
+```{r}
+# Define the year cutoff for remakes (25 years ago)
+year_cutoff <- 1999
+
+# Filter for classic movies that haven't been remade in the last 25 years
+classic_movies <- TITLE_BASICS |>
+  inner_join(TITLE_RATINGS, by = "tconst") |>
+  filter(
+    startYear < year_cutoff,
+    averageRating >= 8.5,
+    numVotes >= 500000
+  ) |>
+  arrange(desc(averageRating))
+
+classic_movies |>
+  DT::datatable(options = list(pageLength = 20))
+
+
+```
+
+The classic movie I’ve chosen for this project is Life Is Beautiful. This remarkable film fits into the Comedy, Drama, and Romance genres, boasting an impressive average rating of 8.6 and a high success metric of 116.41 points. This movie encompasses all the qualities we are looking for: it appeals to a wide audience, evokes laughter, and leaves viewers with a sense of fulfillment and a valuable lesson.
+
+## Putting It Together 
+
+# Elevator Pitch: Remake of “TLife Is Beautiful”
+
+I am thrilled to propose a remake of the timeless classic Life Is Beautiful, featuring the extraordinary talents of Seth MacFarlane and Hank Azaria, with acclaimed director Guillermo del Toro leading the project.
+
+In the last decade, comedy-drama movies have surged in popularity, driven by the rise of streaming platforms and a growing audience appetite for nuanced, character-driven stories that blend humor with emotional depth. This market trend emphasizes the need for well-developed characters and complex motivations, making our project more relevant than ever.
+
+Seth MacFarlane brings a unique blend of humor and storytelling that resonates with diverse audiences. His ability to tackle complex themes through satire and social commentary, demonstrated in his work on The Orville, makes him the ideal choice to infuse Life Is Beautiful with both laughter and depth.
+
+Hank Azaria, renowned for his versatile voice acting in The Simpsons, adds richness to our cast. His memorable character portrayals reflect a commitment to authenticity and empathy, essential qualities for a film exploring love and resilience.
+
+Under Guillermo del Toro's visionary direction, we will delve into the profound themes of hope and the human spirit. His mastery of blending genres and emotional storytelling ensures that our remake will resonate with modern audiences.
+
+With MacFarlane's humor, Azaria's depth, and del Toro's artistic vision, this project is poised to become a compelling and heartfelt cinematic experience that captures the essence of Life Is Beautiful for today's viewers.
+
+
+```{r}
+
+
+install.packages("magick")
+
+
+library(magick)
+
+
+img <- image_read("C:/Users/krisf/Downloads/050520_LifeIsBeautiful_05.jpg") 
+
+
+print(img)
+
+
+```
+
+
+
+
+
+

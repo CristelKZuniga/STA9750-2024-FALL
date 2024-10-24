@@ -1,0 +1,5 @@
+---
+title: "mp001_quarto.yml"
+format: revealjs
+editor: visual
+---
