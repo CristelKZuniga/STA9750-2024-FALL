@@ -1,0 +1,205 @@
+---
+title: "Mini Project #03: Do Proportional Electoral College Allocations Yield a More Representative Presidency?"
+editor: visual
+---
+
+# Introduction 
+
+Welcome to Mini Project 03 ..........KEEP WRITING
+
+# **Data I: US House Election Votes from 1976 to 2022** 
+
+Our first step is to download the [**U.S. House 1976–2022**](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2) CSV file from the web browser. This data set collects votes from all biennial congressional races in all 50 states.
+
+<details>
+
+<summary>**Initial codes to set up the report**</summary>
+
+Setting up the codes to avoid warning errors
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+
+```
+
+</details>
+
+<details>
+
+<summary>**Code to download the the [U.S. House 1976–2022](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2) CSV file**</summary>
+
+The following code shows how to download the U.S. House 1979- 2022 database.
+
+```{r, cache=TRUE}
+get_ushouse_file <- function(){
+    # The complete URL for direct file download using the fileId parameter
+    FILE_URL <- "https://dataverse.harvard.edu/api/access/datafile/8963860"
+    
+    # Name of the local file to save the data
+    local_file <- "1976-2022-house.tab"
+    
+    # Download the file if it does not already exist locally
+    if(!file.exists(local_file)){
+        download.file(FILE_URL, destfile = local_file, mode = "wb")
+    }
+    
+    # Read the downloaded file into a data frame, using read_tsv for tab-separated files
+    as.data.frame(readr::read_tsv(local_file, lazy=FALSE))
+}
+# Call the function and read the data into a data frame
+ushouse_data <- get_ushouse_file()
+# Display the first few rows of the data to verify
+head(ushouse_data)
+
+```
+
+</details>
+
+Secondly, we'll also download, the dataset [Statewide presidential vote counts from 1976 to 2022](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX).
+
+Note that this time, we'll read the CSV file directly from our repository, not from the website.
+
+```{r, cache=TRUE}
+# Install and load the readr package if it's not already installed
+if (!requireNamespace("readr", quietly = TRUE)) {
+    install.packages("readr")
+}
+library(readr)
+
+file_path <- "C:\\Users\\krisf\\OneDrive\\Documentos\\STA9750-2024-FALL\\1976-2020-president.csv"
+
+# Read the file, assuming it's a .csv file
+uspresident_data <- read_csv(file_path)
+
+
+# Display the first few rows of the dataset
+head(uspresident_data)
+
+```
+
+# **Data II: Congressional Boundary Files 1976 to 2012**
+
+<details>
+
+Loading the required libraries:
+
+<summary>**Loading the required libraries for the document**</summary>
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(httr)
+```
+
+```{r warning=FALSE, message=FALSE}
+require(ggplot2)
+require(sf)
+```
+
+</details>
+
+<details>
+
+<summary>**Task 1: Code to download the Congressional Shapefiles 1976 - 2012**</summary>
+
+The following code shows how to download the Congressional Shapefiles.
+
+```{r, cache=TRUE}
+library(httr)
+library(sf)
+
+# Base URL for downloading congressional shapefiles
+base_url <- "https://cdmaps.polisci.ucla.edu/shp/districts"
+
+# Define the range of Congress numbers (from 94 to 113)
+congresses <- 94:113  
+
+# Define the directory where the shapefiles will be saved
+download_dir <- "congress_shapefiles"
+if (!dir.exists(download_dir)) dir.create(download_dir)
+
+# Function to download the shapefile if not already downloaded
+download_shapefile <- function(congress, base_url, download_dir) {
+  # Construct the URL for the specific shapefile
+  file_url <- paste0(base_url, congress, ".zip")
+  
+  # Define the local filename for the zip file
+  zip_file <- file.path(download_dir, paste0("districts", congress, ".zip"))
+  
+  # Check if the file already exists
+  if (!file.exists(zip_file)) {
+    message(paste("Downloading Congress", congress, "shapefile..."))
+    GET(file_url, write_disk(zip_file, overwrite = TRUE))
+  } else {
+    message(paste("File for Congress", congress, "already exists. Skipping download."))
+  }
+  return(zip_file)
+}
+
+# Function to unzip the downloaded shapefiles and load the .shp file
+unzip_and_load_shapefile <- function(zip_file) {
+  unzip_dir <- gsub("\\.zip$", "", zip_file)  # Remove .zip extension for folder name
+  # Unzip if the directory does not already exist
+  if (!dir.exists(unzip_dir)) unzip(zip_file, exdir = unzip_dir)
+  
+  # Define the path to the .shp file (inside "districtShapes" folder)
+  shapefile_path <- file.path(unzip_dir, "districtShapes", paste0(basename(unzip_dir), ".shp"))
+  
+  # Load the shapefile if it exists
+  if (file.exists(shapefile_path)) {
+    return(st_read(shapefile_path))
+  } else {
+    warning("Shapefile not found for Congress ", basename(unzip_dir))
+    return(NULL)
+  }
+}
+
+# Loop through all specified Congress numbers, download, and load each shapefile
+for (congress in congresses) {
+  zip_file <- download_shapefile(congress, base_url, download_dir)
+  shapefile_data <- unzip_and_load_shapefile(zip_file)
+  
+  #Display the first few rows if successfully loaded
+  if (!is.null(shapefile_data)) {
+    print(paste("Data for Congress", congress))
+    print(head(shapefile_data))
+  }
+}
+
+```
+
+</details>
+
+# Data III : **Congressional Boundary Files 2014 to Present**
+
+<details>
+
+<summary>Task2 : Code to download the Congressional Shapefiles 2014-2022</summary>
+
+Download congressional shapefiles from the US Census Bureau for all US Congresses from 2014 to 2022.
+
+```{r, cache=TRUE}
+
+
+```
+
+</details>
+
+# Task 3: Exploration of Vote Count Data 
+
+1.  Which states have gained and lost the most seats in the US House of Representatives between 1976 and 2022?
+
+2.  New York State has a unique “fusion” voting system where one candidate can appear on multiple “lines” on the ballot and their vote counts are totaled. For instance, in 2022, Jerrold Nadler appeared on both the Democrat and Working Families party lines for NYS’ 12th Congressional District. He received 200,890 votes total (184,872 as a Democrat and 16,018 as WFP), easily defeating Michael Zumbluskas, who received 44,173 votes across three party lines (Republican, Conservative, and Parent).
+
+    Are there any elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes their received from their “major party line” (Democrat or Republican) and not their total number of votes across all lines?
+
+3.  Do presidential candidates tend to run ahead of or run behind congressional candidates in the same state? That is, does a Democratic candidate for president tend to get more votes in a given state than all Democratic congressional candidates in the same state?
+
+    Does this trend differ over time? Does it differ across states or across parties? Are any presidents particularly more or less popular than their co-partisans?
