@@ -3,11 +3,11 @@ title: "Mini Project #03: Do Proportional Electoral College Allocations Yield a 
 editor: visual
 ---
 
-# Introduction 
+# Introduction
 
 Welcome to Mini Project 03 ..........KEEP WRITING
 
-# **Data I: US House Election Votes from 1976 to 2022** 
+# **Data I: US House Election Votes from 1976 to 2022**
 
 Our first step is to download the [**U.S. House 1976–2022**](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2) CSV file from the web browser. This data set collects votes from all biennial congressional races in all 50 states.
 
@@ -60,7 +60,9 @@ head(ushouse_data)
 
 </details>
 
-Secondly, we'll also download, the dataset [Statewide presidential vote counts from 1976 to 2022](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX).
+<details>
+
+<summary>Secondly, we'll also download, the dataset [Statewide presidential vote counts from 1976 to 2022](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX).</summary>
 
 Note that this time, we'll read the CSV file directly from our repository, not from the website.
 
@@ -81,6 +83,8 @@ uspresident_data <- read_csv(file_path)
 head(uspresident_data)
 
 ```
+
+</details>
 
 # **Data II: Congressional Boundary Files 1976 to 2012**
 
@@ -185,21 +189,638 @@ for (congress in congresses) {
 
 Download congressional shapefiles from the US Census Bureau for all US Congresses from 2014 to 2022.
 
-```{r, cache=TRUE}
+Grouping by years:
+
+```{r, cache=TRUE, error=TRUE}
+
+
+# Load necessary libraries
+library(sf)
+
+# Define the download directory
+get_download_dir <- function() {
+  dir <- "data/shapefiles/census_congressional_districts"
+  if (!dir.exists(dir)) dir.create(dir)
+  return(dir)
+}
+
+# Define years and session numbers (2014-2022 covers 113th to 117th congressional sessions)
+years_sessions <- list(
+  "2014" = "114", "2015" = "114", "2016" = "115",
+  "2017" = "115", "2018" = "116", "2019" = "116",
+  "2020" = "116", "2021" = "116", "2022" = "116"
+)
+
+# Define the base URL structure for Census Bureau shape files for congressional districts
+base_url <- "http://www2.census.gov/geo/tiger/TIGER"
+
+# Function to download, unzip, and display the first lines of shapefiles
+download_and_unzip_shapefiles <- function(shapefile_list) {
+  download_dir <- get_download_dir()
+  
+  for (item in shapefile_list) {
+    year <- as.character(item$year)
+    session <- ifelse(!is.null(item$session), item$session, years_sessions[[year]])
+    
+    # Define file name and download URL
+    file_name <- paste0("tl_", year, "_us_cd", session, ".zip")
+    url <- paste0(base_url, year, "/CD/", file_name)
+    destfile <- file.path(download_dir, file_name)
+    
+    # Download and unzip if not already done
+    if (!file.exists(destfile)) {
+      tryCatch({
+        message("Downloading: ", url)
+        download.file(url, destfile, method = 'curl', mode = "wb")
+        message("Downloaded successfully: ", file_name)
+        
+        # Unzip file
+        unzip_dir <- file.path(download_dir, paste0("unzipped_", session))
+        if (!dir.exists(unzip_dir)) dir.create(unzip_dir)
+        unzip(destfile, exdir = unzip_dir)
+        
+        # Construct shapefile path and read it
+        shp_file <- file.path(unzip_dir, paste0("tl_", year, "_us_cd", session, ".shp"))
+        if (file.exists(shp_file)) {
+          shapefile_data <- sf::st_read(shp_file)
+          print(head(shapefile_data))  # Display the first few lines of the shapefile
+        } else {
+          message("Shapefile not found at: ", shp_file)
+        }
+        
+      }, error = function(e) {
+        message("Failed to download ", url, ": ", e$message)
+      })
+    } else {
+      message("File already exists: ", file_name)
+    }
+  }
+}
+
+# List of shapefiles to download
+shapefiles_to_download <- list(
+  list(year = 2014, state_code = "us"),
+  list(year = 2016, state_code = "us"),
+  list(year = 2020, state_code = "us"),
+  list(year = 2022, state_code = "us")
+)
+
+# Run the function
+download_and_unzip_shapefiles(shapefiles_to_download)
+
+
+```
+
+Reading one of the shapefiles to make sure information has been correctly downloaded.
+
+```{r, cache=TRUE, error=TRUE}
+# Define the path to the shapefile
+shapefile_path <- file.path(unzip_dir, "tl_2020_us_cd116.shp")
+
+# Read the shapefile using sf
+shapefile_data <- st_read(shapefile_path)
+
+# View the first few rows of the data
+head(shapefile_data)
+
+```
+
+</details>
+
+# Task 3: Exploration of Vote Count Data
+
+### 3.1 Variation on the number of sets in the US House of Representatives between 1976 and 2022
+
+1.  Which states have gained and lost the most seats in the US House of Representatives between 1976 and 2022?
+
+    <details>
+
+    <summary>Code to calculate the change on the number of seats in the US House of Representatives in 1976 vs. 2022.</summary>
+
+    ```{r}
+
+    #First we will get the sum per disctricts/State 
+    seats_per_state <- ushouse_data %>%
+      group_by(,year,state) %>%
+      summarize(districts_count = n_distinct(district), .groups = 'drop')
+
+    #Calculate the changes betwwen 1976 and 1922
+    library(dplyr)
+
+    seat_changes_1976_2022 <- seats_per_state %>%
+      filter(year %in% c(1976, 2022)) %>%
+      spread(key = year, value = districts_count) %>%
+      mutate(seat_change = `2022` - `1976`)
+
+
+    # Separate the states with the most gains and losses
+    top_gains <- seat_changes_1976_2022 %>% arrange(desc(seat_change)) %>% head(5)
+    top_losses <- seat_changes_1976_2022 %>% arrange(seat_change) %>% head(5)
+
+    ```
+
+    </details>
+
+    #### Tables and Bar Plots for the Top Gains and Losses.
+
+    ```{r}
+
+    # Load knitr for kable
+    library(knitr)
+    library(ggplot2)
+    library(dplyr)
+
+
+    # Display the table
+    top_gains %>%
+      kable(caption = "Top 5 Most Gained Seats 1976 vs 2022") 
+
+
+    top_losses %>%
+      kable(caption = "Top 5 Most Lost Seats 1976 vs 2022") 
+
+    # Plot for top gains
+    gain_plot <- ggplot(top_gains, aes(x = reorder(state, seat_change), y = seat_change)) +
+      geom_bar(stat = "identity", fill = "steelblue") +
+      labs(title = "Top States by Seat Gains (1976 to 2022)",
+           x = "State", y = "Change in Seats") +
+      theme_minimal() +
+      coord_flip()
+
+
+    # Plot for top losses
+    loss_plot <- ggplot(top_losses, aes(x = reorder(state, seat_change), y = seat_change)) +
+      geom_bar(stat = "identity", fill = "firebrick") +
+      labs(title = "Top States by Seat Losses (1976 to 2022)",
+           x = "State", y = "Change in Seats") +
+      theme_minimal() +
+      coord_flip()
+    print(gain_plot)
+    print (loss_plot)
+    ```
+
+    *Per the results the states that have gained more seats between 1976 and 2022 are Texas, Florida, California, Arizona and Georgia. On the other hand, the states whose have lost more seats are New York, Ohio, Pennsylvania, Illinois and Michigan.*
+
+<details>
+
+```{r}
+#Listing all the datasets 
+list.files()
+
+```
+
+```{r}
+#Loading US President Database
+uspresident_data <- read.csv("1976-2020-president.csv")
+View(uspresident_data)
+
+```
+
+```{r}
+#Loading US House Database
+ushouse_data <- read.delim("1976-2022-house.tab")
+View(ushouse_data)
+```
+
+</details>
+
+### 3.2 New York State Fusion Parties Analysis. 
+
+2.  New York State has a unique “fusion” voting system where one candidate can appear on multiple “lines” on the ballot and their vote counts are totaled. For instance, in 2022, Jerrold Nadler appeared on both the Democrat and Working Families party lines for NYS’ 12th Congressional District. He received 200,890 votes total (184,872 as a Democrat and 16,018 as WFP), easily defeating Michael Zumbluskas, who received 44,173 votes across three party lines (Republican, Conservative, and Parent).
+
+    Are there any elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes their received from their “major party line” (Democrat or Republican) and not their total number of votes across all lines?
+
+    ```{r, cache=TRUE, error=TRUE}
+
+    library(dplyr)
+    library(knitr)
+    library(ggplot2)
+
+    #First we'll filter by total of votes per State
+     ny_votes <- ushouse_data %>%
+       group_by(year,state) %>%
+       filter(state=="NEW YORK")
+     
+     nycandidate_total <- ny_votes %>%
+      group_by(candidate, year) %>%
+      mutate(candidatetotal = sum(candidatevotes, na.rm = TRUE)) %>%
+      ungroup()
+     
+    nycandidate_winner <- nycandidate_total %>%
+      group_by(year, district) %>%
+      slice_max(candidatetotal, n = 1) %>%
+      select(year, candidate, candidatetotal) %>%
+      distinct(candidate, .keep_all = TRUE)
+
+    nycandidate_parties_total <- ny_votes %>%
+      group_by(candidate, year) %>%
+      mutate(candidatetotal = sum(candidatevotes, na.rm = TRUE)) %>%
+      ungroup() %>%
+      filter(party == "DEMOCRAT" | party == "REPUBLICAN")
+
+    nycandidate_parties_winner <- nycandidate_total %>%
+      group_by(year, district) %>%
+      slice_max(candidatevotes, n = 1) %>%
+      select(year, candidate, candidatevotes)
+
+    if (any(nycandidate_winner$candidate != nycandidate_parties_winner$candidate)) {
+      print("There are elections that would have had a different outcome.")
+    } else {
+      print("Per data, elections would had not a different outcome.")
+    }
+
+     
+     
+     #View(nycandidate_parties_winner)
+
+    ```
+
+    *Per the results, in our data analysis, **yes, there are elections that would have had a different outcome if the candidate was running only under one party.***
+
+### 3.3 Analysis of different trends. 
+
+3.  Do presidential candidates tend to run ahead of or run behind congressional candidates in the same state? That is, does a Democratic candidate for president tend to get more votes in a given state than all Democratic congressional candidates in the same state?
+
+    Does this trend differ over time? Does it differ across states or across parties? Are any presidents particularly more or less popular than their co-partisans?
+
+    <details>
+
+    <summary>Code to summarize the number of votes for US House and Presidential</summary>
+
+```{r, cache=TRUE, error=TRUE}
+
+# Summarize presidential votes (1976-2012)
+presidential_votes <- uspresident_data %>%
+  filter(office == "US PRESIDENT", year >= 1976, year <= 2012) %>%
+  group_by(year) %>%
+  summarise(total_president_votes = sum(candidatevotes), .groups = "drop")
+
+# Summarize congressional votes (1976-2012)
+congressional_votes <- ushouse_data %>%
+  filter(office == "US HOUSE", year >= 1976, year <= 2012) %>%
+  group_by(year) %>%
+  summarise(total_congress_votes = sum(candidatevotes), .groups = "drop")
+
+# Combine the two datasets
+vote_comparison <- presidential_votes %>%
+  left_join(congressional_votes, by = "year")
+
+library(scales)
+
+# Calculate and format percentage difference
+vote_comparison <- vote_comparison %>%
+  mutate(vote_percentage_difference = 
+           percent((total_president_votes - total_congress_votes) / total_congress_votes))
+
+
+
+#head(vote_comparison)
+
+```
+
+</details>
+
+#### Table showing the difference between the % of voters for Presidents vs. Congress. 
+
+```{r}
+
+vote_comparison %>%
+  kable(caption = "Vote Percentage Difference between President and Congress - 1976 vs 2022") 
+```
+
+```{r}
+
+vote_comparison$year <- as.factor(vote_comparison$year)
+
+ggplot(vote_comparison, aes(x = year, y = vote_percentage_difference)) +
+  geom_bar(stat = "identity", fill = "blue", color = "blue", width = 0.6) +
+  labs(
+    title = "Percentage Difference Presidential and Congressional Votes (1976 - 2012)",
+    x = "Year",
+    y = "Vote Percentage Difference (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+
+```
+
+*As we can observe in this graph, the years 1980 and 1988 had the lowest percentage difference between congressional and presidential votes. This likely indicates that, during these elections, the majority of U.S. House representatives were from the same party as the president elected that year. In contrast, in years like 1976 or 2004, the elected president likely faced a Congress controlled by the opposite party.*
+
+#### Comparison Analysis by State, between US House and President votes from 1976 to 2012.
+
+The analysis is very similar as the previous one, but now we need to group by state.
+
+<details>
+
+<summary>Code to summarize the number of votes per state for US House and Presidential</summary>
+
+```{r, cache=TRUE, error=TRUE}
+
+# Summarize presidential votes (1976-2012)
+state_presidential_votes <- uspresident_data %>%
+  filter(office == "US PRESIDENT", year >= 1976, year <= 2012) %>%
+  group_by(year, state) %>%
+  summarise(total_president_votes = sum(candidatevotes), .groups = "drop")
+
+# Summarize congressional votes (1976-2012)
+state_congressional_votes <- ushouse_data %>%
+  filter(office == "US HOUSE", year >= 1976, year <= 2012) %>%
+  group_by(year, state) %>%
+  summarise(total_congress_votes = sum(candidatevotes), .groups = "drop")
+
+# Combine the two datasets
+state_vote_comparison <- state_presidential_votes %>%
+  left_join(state_congressional_votes, by =c("year", "state"))
+
+library(scales)
+
+# Calculate and format percentage difference
+state_vote_comparison <- state_vote_comparison %>%
+  mutate(state_vote_percentage_difference = 
+           percent((total_president_votes - total_congress_votes) / total_congress_votes))
+```
+
+</details>
+
+```{r}
+state_vote_comparison %>%
+  arrange(desc(state_vote_percentage_difference)) %>%  # Sort by percentage difference
+  head(10) %>%
+  kable(
+    col.names = c("Year", "State", "Presidential Votes", "Congressional Votes", "Percentage Difference"),
+    caption = "Top 10 Highest Percentage Differences between Presidential and Congressional Votes (1976-2012)"
+  )
+
+```
+
+I*n this table, you'll observe the top 10 highest percentage difference along the years by state.*
+
+#### Comparison Analysis by Pary, between US House and President votes from 1976 to 2012.
+
+In this analysis, we'll take in consideration the party per year.
+
+<details>
+
+<summary>Code to summarize the number of votes per state for US House and Presidential</summary>
+
+```{r, cache=TRUE, error=TRUE}
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)  
+
+# Aggregate votes by party for presidential and congressional candidates
+congressional_party_votes <- ushouse_data %>%
+  filter(office == "US HOUSE", year >= 1976, year <= 2012) %>%
+  group_by(year, party) %>%
+  summarise(congress_votes = sum(candidatevotes), .groups = "drop")
+
+president_votes <- uspresident_data %>%
+  filter(office == "US PRESIDENT", year >= 1976, year <= 2012) %>%
+  group_by(year, party_simplified) %>%
+  summarise(president_votes = sum(candidatevotes), .groups = "drop") %>%
+  rename(party = party_simplified)
+
+# Combine the data sets
+president_vote_comparison <- president_votes %>%
+  left_join(congressional_party_votes, by = c("party", "year"))
+
+# Reshape data for plotting (make sure tidyr is loaded)
+vote_long <- president_vote_comparison %>%
+  pivot_longer(cols = c(president_votes, congress_votes), 
+               names_to = "vote_type", 
+               values_to = "votes")
+
+# Create a 'percentage' column for pie chart
+vote_long <- vote_long %>%
+  group_by(vote_type, year) %>%
+  mutate(percentage = votes / sum(votes))
+
+# Plotting pie charts by year first, then by party
+ggplot(vote_long, aes(x = "", y = percentage, fill = party)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  facet_grid(year ~ vote_type) +  
+  labs(title = "Distribution of Votes Over Time by Party for Presidential and Congressional Candidates (1976 - 2012)",
+       fill = "Party") +
+  theme_void() +
+  theme(legend.position = "top") +
+  scale_fill_brewer(palette = "Set3")
+
 
 
 ```
 
 </details>
 
-# Task 3: Exploration of Vote Count Data 
+*As we can see in these pie charts over the years, in 1992, the Republican Party lost votes to other parties. However, in 2012, the contest was very close between the Democratic and Republican parties.*
 
-1.  Which states have gained and lost the most seats in the US House of Representatives between 1976 and 2022?
+# Importing and Plotting Shape File Data 
 
-2.  New York State has a unique “fusion” voting system where one candidate can appear on multiple “lines” on the ballot and their vote counts are totaled. For instance, in 2022, Jerrold Nadler appeared on both the Democrat and Working Families party lines for NYS’ 12th Congressional District. He received 200,890 votes total (184,872 as a Democrat and 16,018 as WFP), easily defeating Michael Zumbluskas, who received 44,173 votes across three party lines (Republican, Conservative, and Parent).
+### Task 4: Automate Zip File Extraction
 
-    Are there any elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes their received from their “major party line” (Democrat or Republican) and not their total number of votes across all lines?
+```{r}
+library(ggplot2)
+library(sf)
 
-3.  Do presidential candidates tend to run ahead of or run behind congressional candidates in the same state? That is, does a Democratic candidate for president tend to get more votes in a given state than all Democratic congressional candidates in the same state?
+# File name
+zip_file <- "Borough Boundaries.zip"
 
-    Does this trend differ over time? Does it differ across states or across parties? Are any presidents particularly more or less popular than their co-partisans?
+# Check if the file exists
+if (!file.exists(zip_file)) {
+  stop("The zip file does not exist in the specified path.")
+}
+
+# Define the function to read .shp file from a zip archive
+read_shp_from_zip <- function(zip_file) {
+  # Create a temporary directory to extract the zip file
+  td <- tempdir() 
+  
+  # Extract the contents of the zip file
+  zip_contents <- unzip(zip_file, exdir = td)
+  
+  # Identify the .shp file among the extracted contents
+  fname_shp <- zip_contents[grepl("\\.shp$", zip_contents)]
+  
+  # Check if a .shp file was found
+  if (length(fname_shp) == 0) {
+    stop("No .shp file found in the zip archive.")
+  }
+  
+  # Read the shapefile using read_sf
+  nyc_sf <- read_sf(fname_shp)
+  
+  # Return the shapefile data
+  return(nyc_sf)
+}
+
+# Use the function to read the shapefile from the zip
+nyc_sf <- read_shp_from_zip(zip_file)
+
+```
+
+#### Chloropleth Map: Borough boundaries using 'sf geom'.
+
+```{r}
+head(nyc_sf)
+
+ggplot(nyc_sf, 
+       aes(geometry=geometry, 
+           fill = shape_area)) + 
+    geom_sf()
+
+```
+
+# **Task 5: 2000 Presidential Election Electoral College Results**
+
+<details>
+
+<summary>Code to download and unzip the file for State Boundaries and analyze this file with the US Presidential dataset. </summary>
+
+```{r, cache=TRUE, error=TRUE}
+
+library(ggplot2)
+library(sf)
+
+if(!file.exists("state_boundaries.zip")){
+  download.file("https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_500k.zip", 
+                destfile="state_boundaries.zip")
+}
+
+# Define the function to read .shp file from a zip archive
+read_shp_from_zip <- function(zip_file) {
+  # Create a temporary directory
+  td <- tempdir(); 
+  # Extract the contents of the zip file
+  zip_contents <- unzip("state_boundaries.zip", 
+                        exdir = td)
+  # Identify the .shp file among the extracted contents
+  fname_shp <- zip_contents[grepl("shp$", zip_contents)]
+  # Read the shapefile into R using st_read
+  states_sf <- st_read(fname_shp)
+  return(states_sf)
+}
+
+states_sf <- read_shp_from_zip("state_boundaries.zip")
+
+# Reshape the wholistic dataset with an epmhasis on the 2000 election
+presidentvotes2000_summary <- uspresident_data %>%
+  filter(year == 2000, party_detailed %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+  group_by(state, party_detailed) %>%
+  summarise(candidatevotes = sum(candidatevotes), .groups = "drop") %>%
+  pivot_wider(names_from = party_detailed, values_from = candidatevotes, values_fill = list(candidatevotes = 0)) %>%
+  rename(Democratic_votes = DEMOCRAT, Republican_votes = REPUBLICAN) %>%
+  left_join(
+    uspresident_data %>%
+      filter(year == 2000) %>%
+      select(state, totalvotes) %>%
+      distinct(),
+    by = "state"
+  ) %>%
+  mutate(
+    Winner = case_when(
+      Democratic_votes > Republican_votes ~ "DEMOCRAT",
+      Republican_votes > Democratic_votes ~ "REPUBLICAN",
+      TRUE ~ "TIE"
+    )
+  ) %>%
+  select(state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
+
+# Merge the shapefiles and presidential election data
+states_sf <- states_sf %>%
+  rename("state" = "NAME")
+states_sf$state <- toupper(states_sf$state)
+states_sf <- states_sf %>%
+  left_join(presidentvotes2000_summary, by = c("state"))
+
+
+
+```
+
+</details>
+
+#### Chloropleth Visualization of the 2000 Presidential Election Electoral College Results
+
+```{r}
+
+# Plot the presidential election data and make the map window larger
+ggplot(data = states_sf) +
+  geom_sf(aes(fill = Winner)) +
+  scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red")) +
+  theme_minimal() +
+  labs(title = "US Election Results by State (2000)", fill = "Party") +
+  theme(legend.position = "bottom") +
+  coord_sf(xlim = c(-130, -65), ylim = c(24, 50), expand = FALSE)
+
+
+```
+
+# Task 6: **Advanced Chloropleth Visualization of Electoral College Results**
+
+```{r, cache=TRUE, error=TRUE}
+
+# Load libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(sf)
+
+# Download and read the shapefile
+if(!file.exists("state_boundaries.zip")){
+  download.file("https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_500k.zip", 
+                destfile="state_boundaries.zip")
+}
+
+read_shp_from_zip <- function(zip_file) {
+  td <- tempdir()  
+  zip_contents <- unzip(zip_file, exdir = td)
+  fname_shp <- zip_contents[grepl("shp$", zip_contents)]
+  states_sf <- st_read(fname_shp)
+  return(states_sf)
+}
+
+states_sf <- read_shp_from_zip("state_boundaries.zip") %>%
+  rename(state = NAME) %>%
+  mutate(state = toupper(state))
+
+# Prepare election data over multiple years
+election_summary <- uspresident_data %>%
+  filter(party_detailed %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+  group_by(year, state, party_detailed) %>%
+  summarise(candidatevotes = sum(candidatevotes), .groups = "drop") %>%
+  pivot_wider(names_from = party_detailed, values_from = candidatevotes, values_fill = list(candidatevotes = 0)) %>%
+  rename(Democratic_votes = DEMOCRAT, Republican_votes = REPUBLICAN) %>%
+  left_join(
+    uspresident_data %>%
+      select(year, state, totalvotes) %>%
+      distinct(),
+    by = c("year", "state")
+  ) %>%
+  mutate(
+    Winner = case_when(
+      Democratic_votes > Republican_votes ~ "DEMOCRAT",
+      Republican_votes > Democratic_votes ~ "REPUBLICAN",
+      TRUE ~ "TIE"
+    )
+  ) %>%
+  select(year, state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
+
+# Merge with shapefiles
+states_sf <- states_sf %>%
+  left_join(election_summary, by = "state")
+
+# Create the faceted plot
+ggplot(data = states_sf) +
+  geom_sf(aes(fill = Winner), color = "white") +
+  scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red", "TIE" = "gray")) +
+  theme_minimal() +
+  labs(title = "U.S. Presidential Election Results by State", fill = "Party") +
+  theme(legend.position = "bottom") +
+  coord_sf(xlim = c(-130, -65), ylim = c(24, 50), expand = FALSE) +
+  facet_wrap(~ year, ncol = 1)  # Facet by year with a single column for readability
+
+```
