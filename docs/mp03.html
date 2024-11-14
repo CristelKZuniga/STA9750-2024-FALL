@@ -150,7 +150,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>Welcome to Mini Project 03 ……….KEEP WRITING</p>
+<p>Welcome to Mini Project 03. This project focuses on analyzing voting patterns and political trends in U.S. elections from 1976 to 2022. By examining data across multiple election cycles, this analysis aims to uncover shifts in voter behavior, partisan changes, and regional dynamics over time. We will look into both presidential and congressional election results, highlighting key trends and outcomes that have shaped the political landscape.</p>
 </section>
 <section id="data-i-us-house-election-votes-from-1976-to-2022" class="level1">
 <h1><strong>Data I: US House Election Votes from 1976 to 2022</strong></h1>
@@ -1226,22 +1226,25 @@ Geodetic CRS:  NAD83
 <pre><code> [1] "_quarto.yml"                    "1976-2020-president.csv"       
  [3] "1976-2020-president.tab"        "1976-2022-house.tab"           
  [5] "2022_expenses.csv"              "2022_fare_revenue.xlsx"        
- [7] "Borough Boundaries.zip"         "codebook-us-house-1976-2020.md"
- [9] "congress_113th_shapefile.zip"   "congress_shapefiles"           
-[11] "data"                           "docs"                          
-[13] "MP #01.R"                       "mp001_quarto.yml.qmd"          
-[15] "MP01.pdf"                       "mp01.qmd"                      
-[17] "mp01_quarto.yml"                "MP02 PDF.pdf"                  
-[19] "mp02.qmd"                       "mp02test.R"                    
-[21] "mp03.qmd"                       "mp03.rmarkdown"                
-[23] "mp03_cache"                     "mp03_files"                    
-[25] "name.basics.tsv.gz"             "README"                        
-[27] "ridership.xlsx"                 "sources-president.tab"         
-[29] "STA9750-2024-FALL"              "STA9750-2024-FALL.Rproj"       
-[31] "state_boundaries.zip"           "test for GitHub"               
-[33] "title.basics.tsv.gz"            "title.crew.tsv.gz"             
-[35] "title.episode.tsv.gz"           "title.principals.tsv.gz"       
-[37] "title.ratings.tsv.gz"           "Week 4 - Pre assigment.R"      </code></pre>
+ [7] "Borough Boundaries.zip"         "cb_2018_us_cd116_5m.zip"       
+ [9] "codebook-us-house-1976-2020.md" "congress_113th_shapefile.zip"  
+[11] "congress_shapefiles"            "data"                          
+[13] "docs"                           "ECV.csv"                       
+[15] "ECVs.csv"                       "election_results.gif"          
+[17] "MP #01.R"                       "mp001_quarto.yml.qmd"          
+[19] "MP01.pdf"                       "mp01.qmd"                      
+[21] "mp01_quarto.yml"                "MP02 PDF.pdf"                  
+[23] "mp02.qmd"                       "mp02test.R"                    
+[25] "mp03-1.pdf"                     "mp03.pdf"                      
+[27] "mp03.qmd"                       "mp03.rmarkdown"                
+[29] "mp03_cache"                     "mp03_files"                    
+[31] "name.basics.tsv.gz"             "README"                        
+[33] "ridership.xlsx"                 "sources-president.tab"         
+[35] "STA9750-2024-FALL"              "STA9750-2024-FALL.Rproj"       
+[37] "state_boundaries.zip"           "test for GitHub"               
+[39] "title.basics.tsv.gz"            "title.crew.tsv.gz"             
+[41] "title.episode.tsv.gz"           "title.principals.tsv.gz"       
+[43] "title.ratings.tsv.gz"           "Week 4 - Pre assigment.R"      </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1730,8 +1733,12 @@ Geodetic CRS:  WGS 84
 </section>
 </section>
 </section>
-<section id="task-5-chloropleth-visualization-of-the-2000-presidential-election-electoral-college-results" class="level1">
-<h1><strong>Task 5: Chloropleth Visualization of the 2000 Presidential Election Electoral College Results</strong></h1>
+<section id="task-5-2000-presidential-election-electoral-college-results" class="level1">
+<h1><strong>Task 5: 2000 Presidential Election Electoral College Results</strong></h1>
+<details>
+<summary>
+Code to download and unzip the file for State Boundaries and analyze this file with the US Presidential dataset.
+</summary>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
@@ -1758,7 +1765,7 @@ Geodetic CRS:  WGS 84
 <span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> <span class="fu">read_shp_from_zip</span>(<span class="st">"state_boundaries.zip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reading layer `cb_2018_us_state_500k' from data source 
-  `C:\Users\krisf\AppData\Local\Temp\RtmpQVLMOR\cb_2018_us_state_500k.shp' 
+  `C:\Users\krisf\AppData\Local\Temp\RtmpcJgpbK\cb_2018_us_state_500k.shp' 
   using driver `ESRI Shapefile'
 Simple feature collection with 56 features and 9 fields
 Geometry type: MULTIPOLYGON
@@ -1794,27 +1801,344 @@ Geodetic CRS:  NAD83</code></pre>
 <span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"state"</span> <span class="ot">=</span> <span class="st">"NAME"</span>)</span>
 <span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a>states_sf<span class="sc">$</span>state <span class="ot">&lt;-</span> <span class="fu">toupper</span>(states_sf<span class="sc">$</span>state)</span>
 <span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> states_sf <span class="sc">%&gt;%</span></span>
-<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(presidentvotes2000_summary, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>))</span>
-<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-32"><a href="#cb41-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the presidential election data and make the map window larger</span></span>
-<span id="cb41-33"><a href="#cb41-33" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> states_sf) <span class="sc">+</span></span>
-<span id="cb41-34"><a href="#cb41-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Winner)) <span class="sc">+</span></span>
-<span id="cb41-35"><a href="#cb41-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"REPUBLICAN"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
-<span id="cb41-36"><a href="#cb41-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb41-37"><a href="#cb41-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"US Election Results by State (2000)"</span>, <span class="at">fill =</span> <span class="st">"Party"</span>) <span class="sc">+</span></span>
-<span id="cb41-38"><a href="#cb41-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb41-39"><a href="#cb41-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">130</span>, <span class="sc">-</span><span class="dv">65</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">50</span>), <span class="at">expand =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(presidentvotes2000_summary, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+<section id="chloropleth-visualization-of-the-2000-presidential-election-electoral-college-results" class="level4">
+<h4 class="anchored" data-anchor-id="chloropleth-visualization-of-the-2000-presidential-election-electoral-college-results">Chloropleth Visualization of the 2000 Presidential Election Electoral College Results</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the presidential election data and make the map window larger</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> states_sf) <span class="sc">+</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Winner)) <span class="sc">+</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"REPUBLICAN"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"US Election Results by State (2000)"</span>, <span class="at">fill =</span> <span class="st">"Party"</span>) <span class="sc">+</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">130</span>, <span class="sc">-</span><span class="dv">65</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">50</span>), <span class="at">expand =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="mp03_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="mp03_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="task-6-advanced-chloropleth-visualization-of-electoral-college-results" class="level1">
+<h1>Task 6: <strong>Advanced Chloropleth Visualization of Electoral College Results</strong></h1>
+<details>
+<summary>
+Code to download and unzip the file for State Boundaries and analyze this file with the US Presidential dataset.
+</summary>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>safe_download <span class="ot">&lt;-</span> <span class="cf">function</span>(url, destfile) {</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(destfile)) {</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tryCatch</span>(<span class="fu">download.file</span>(url, destfile, <span class="at">mode =</span> <span class="st">"wb"</span>),</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">warning</span>(<span class="st">"Failed to download "</span>, url))</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="fu">safe_download</span>(<span class="st">"https://drive.usercontent.google.com/uc?id=1tkRPPYIKpOICUdO1eJfrHAnHhF7RSorG&amp;export=download"</span>, <span class="st">"cb_2018_us_cd116_5m.zip"</span>)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="do">##-</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>td <span class="ot">&lt;-</span> <span class="fu">tempdir</span>(); </span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>zip_contents <span class="ot">&lt;-</span> <span class="fu">unzip</span>(<span class="st">"cb_2018_us_cd116_5m.zip"</span>, </span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>                      <span class="at">exdir =</span> td)</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>fname_shp <span class="ot">&lt;-</span> zip_contents[<span class="fu">grepl</span>(<span class="st">"shp$"</span>, zip_contents)]</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>fname_dbf <span class="ot">&lt;-</span> zip_contents[<span class="fu">grepl</span>(<span class="st">"dbf$"</span>, zip_contents)]</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>fname_shx <span class="ot">&lt;-</span> zip_contents[<span class="fu">grepl</span>(<span class="st">"shx$"</span>, zip_contents)]</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the shapefile</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>shapefile_path <span class="ot">&lt;-</span> <span class="st">"cb_2018_us_cd116_5m.shp"</span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>us_sf <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(fname_shp)</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>us_sf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 441 features and 8 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -179.1473 ymin: -14.55255 xmax: 179.7785 ymax: 71.35256
+Geodetic CRS:  NAD83
+# A tibble: 441 × 9
+   STATEFP CD116FP AFFGEOID      GEOID LSAD  CDSESSN       ALAND     AWATER
+   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;         &lt;dbl&gt;      &lt;dbl&gt;
+ 1 36      05      5001600US3605 3605  C2    116       134550083  184506173
+ 2 01      03      5001600US0103 0103  C2    116     19537640555  471223121
+ 3 01      02      5001600US0102 0102  C2    116     26269902298  303582941
+ 4 08      02      5001600US0802 0802  C2    116     19523675148  236595196
+ 5 12      07      5001600US1207 1207  C2    116      1017471375  110917454
+ 6 12      05      5001600US1205 1205  C2    116      9888522481  239830493
+ 7 29      06      5001600US2906 2906  C2    116     47132969024  528128323
+ 8 29      08      5001600US2908 2908  C2    116     51543398547  444793592
+ 9 24      03      5001600US2403 2403  C2    116       788544340  252344417
+10 24      05      5001600US2405 2405  C2    116      3840096355 2066469028
+# ℹ 431 more rows
+# ℹ 1 more variable: geometry &lt;MULTIPOLYGON [°]&gt;</code></pre>
+</div>
+</div>
+</details>
+<section id="advanced-chloropleth-visualization-of-electoral-college-results-2000" class="level4">
+<h4 class="anchored" data-anchor-id="advanced-chloropleth-visualization-of-electoral-college-results-2000"><strong>Advanced Chloropleth Visualization of Electoral College Results (2000)</strong></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the repeated data for animation</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>us_sf_repeats <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    us_sf <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">rnorm</span>(<span class="dv">441</span>), <span class="at">frame =</span> <span class="dv">1</span>), </span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    us_sf <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">rnorm</span>(<span class="dv">441</span>), <span class="at">frame =</span> <span class="dv">2</span>), </span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    us_sf <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">rnorm</span>(<span class="dv">441</span>), <span class="at">frame =</span> <span class="dv">3</span>), </span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    us_sf <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">rnorm</span>(<span class="dv">441</span>), <span class="at">frame =</span> <span class="dv">4</span>), </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    us_sf <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">rnorm</span>(<span class="dv">441</span>), <span class="at">frame =</span> <span class="dv">5</span>)</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>bbox <span class="ot">&lt;-</span> <span class="fu">st_bbox</span>(us_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the plot with adjusted scaling and color</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">library</span>(ggplot2)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gganimate)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("viridis")</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>bbox <span class="ot">&lt;-</span> <span class="fu">st_bbox</span>(us_sf_repeats) <span class="co"># Set bounding box based on spatial data</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot with adjusted scaling, color, and title</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(us_sf_repeats, <span class="fu">aes</span>(<span class="at">geometry =</span> geometry, <span class="at">fill =</span> value)) <span class="sc">+</span> </span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span> </span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transition_time</span>(frame) <span class="sc">+</span> </span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"magma"</span>) <span class="sc">+</span>   </span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span>            </span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"US Election results (2000)"</span>,</span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Votes"</span></span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>)</span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(</span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">130</span>, <span class="sc">-</span><span class="dv">60</span>),  </span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">50</span>),     </span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="cn">FALSE</span></span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp03_files/figure-html/unnamed-chunk-27-1.gif" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="evaluating-fairness-of-ecv-allocation-schemes" class="level1">
+<h1>Evaluating Fairness of ECV Allocation Schemes</h1>
+<section id="task-7-evaluating-fairness-of-ecv-allocation-schemes" class="level3">
+<h3 class="anchored" data-anchor-id="task-7-evaluating-fairness-of-ecv-allocation-schemes">Task 7: Evaluating Fairness of ECV Allocation Schemes</h3>
+<p>Write a fact check evaluating the fairness of the different ECV electoral allocation schemes. To do so, you should first determine which allocation scheme you consider “fairest”.</p>
+<section id="analysis-and-background" class="level4">
+<h4 class="anchored" data-anchor-id="analysis-and-background">Analysis and Background:</h4>
+<p>ECV stands for <strong>Effective Closeness Voting</strong>, a voting method that focuses on fairness and how votes are allocated in a way that reflects the preferences of the voters. It is often used in the context of proportional representation or electoral systems that aim to allocate seats or power in a way that matches voter preferences.</p>
+<p>The <strong>Proportional Representation</strong> scheme seems to be the fairest, as it allocates ECVs based on the actual proportion of votes each candidate receives, thereby more closely reflecting the will of the people. The <strong>Winner-Takes-All system</strong>, while simpler, can lead to outcomes that don’t reflect the majority’s preference, as seen in the <strong>2000 election</strong>.</p>
+<p>On this analysis, we’ll compare the “Winner-Takes -All (WTA) scheme, versus the Proportional Representation.</p>
+<ol type="1">
+<li>First we need a summarized view of the elections results in 2000, per party and the winner for each state.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for the 2000 election and focus on the Democratic and Republican parties</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>presidentvotes2000_summary <span class="ot">&lt;-</span> uspresident_data <span class="sc">%&gt;%</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2000</span>, party_detailed <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span>, <span class="st">"REPUBLICAN"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, party_detailed) <span class="sc">%&gt;%</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">candidatevotes =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> party_detailed, <span class="at">values_from =</span> candidatevotes, <span class="at">values_fill =</span> <span class="fu">list</span>(<span class="at">candidatevotes =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Democratic_votes =</span> DEMOCRAT, <span class="at">Republican_votes =</span> REPUBLICAN) <span class="sc">%&gt;%</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    uspresident_data <span class="sc">%&gt;%</span></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(state, totalvotes) <span class="sc">%&gt;%</span></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">distinct</span>(),</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"state"</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">Winner =</span> <span class="fu">case_when</span>(</span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>      Democratic_votes <span class="sc">&gt;</span> Republican_votes <span class="sc">~</span> <span class="st">"DEMOCRAT"</span>,</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>      Republican_votes <span class="sc">&gt;</span> Democratic_votes <span class="sc">~</span> <span class="st">"REPUBLICAN"</span>,</span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"TIE"</span></span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, Democratic_votes, Republican_votes, <span class="at">Total_votes =</span> totalvotes, Winner)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="1">
+<li>We need to create the function for both approaches: WTA and Proportional.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co">#load the ecv data CSV Manually created, after exploration</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>state_ecv_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"C:/Users/krisf/OneDrive/Documentos/STA9750-2024-FALL/ECVs.csv"</span>)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Winner-Takse -All function</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>calculate_wta <span class="ot">&lt;-</span> <span class="cf">function</span>(data, state_ecv_data) {</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(state_ecv_data, <span class="at">by =</span> <span class="st">"state"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ecv =</span> <span class="fu">ifelse</span>(Winner <span class="sc">==</span> <span class="st">"DEMOCRAT"</span>, ECVs, <span class="dv">0</span>) <span class="sc">+</span> <span class="fu">ifelse</span>(Winner <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>, ECVs, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(state, Winner, ECVs, ecv)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(data)</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Proportional Representation approach</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>calculate_proportional <span class="ot">&lt;-</span> <span class="cf">function</span>(data, state_ecv_data) {</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(state_ecv_data, <span class="at">by =</span> <span class="st">"state"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">democrat_ecv =</span> <span class="fu">round</span>((Democratic_votes <span class="sc">/</span> Total_votes) <span class="sc">*</span> ECVs),</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">republican_ecv =</span> <span class="fu">round</span>((Republican_votes <span class="sc">/</span> Total_votes) <span class="sc">*</span> ECVs)</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(state, democrat_ecv, republican_ecv)</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(data)</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="3" type="1">
+<li>Setting up the Electoral College Votes (ECVs) per state.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the results under each scheme</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>wta_results <span class="ot">&lt;-</span> <span class="fu">calculate_wta</span>(presidentvotes2000_summary, state_ecv_data)</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>proportional_results <span class="ot">&lt;-</span> <span class="fu">calculate_proportional</span>(presidentvotes2000_summary, state_ecv_data)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="co"># You can now compare the results</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>wta_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 51 × 4
+   state                Winner      ECVs   ecv
+   &lt;chr&gt;                &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt;
+ 1 ALABAMA              REPUBLICAN     9     9
+ 2 ALASKA               REPUBLICAN     3     3
+ 3 ARIZONA              REPUBLICAN    11    11
+ 4 ARKANSAS             REPUBLICAN     6     6
+ 5 CALIFORNIA           DEMOCRAT      54    54
+ 6 COLORADO             REPUBLICAN    10    10
+ 7 CONNECTICUT          DEMOCRAT       7     7
+ 8 DELAWARE             DEMOCRAT       3     3
+ 9 DISTRICT OF COLUMBIA DEMOCRAT      NA    NA
+10 FLORIDA              REPUBLICAN    30    30
+# ℹ 41 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>proportional_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 51 × 3
+   state                democrat_ecv republican_ecv
+   &lt;chr&gt;                       &lt;dbl&gt;          &lt;dbl&gt;
+ 1 ALABAMA                         4              5
+ 2 ALASKA                          1              2
+ 3 ARIZONA                         5              6
+ 4 ARKANSAS                        3              3
+ 5 CALIFORNIA                     29             22
+ 6 COLORADO                        4              5
+ 7 CONNECTICUT                     4              3
+ 8 DELAWARE                        2              1
+ 9 DISTRICT OF COLUMBIA           NA             NA
+10 FLORIDA                        15             15
+# ℹ 41 more rows</code></pre>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Now, we need to apply the schemes and compare the results.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the results under each scheme</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>wta_results <span class="ot">&lt;-</span> <span class="fu">calculate_wta</span>(presidentvotes2000_summary, state_ecv_data)</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>proportional_results <span class="ot">&lt;-</span> <span class="fu">calculate_proportional</span>(presidentvotes2000_summary, state_ecv_data)</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="co"># You can now compare the results</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>wta_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 51 × 4
+   state                Winner      ECVs   ecv
+   &lt;chr&gt;                &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt;
+ 1 ALABAMA              REPUBLICAN     9     9
+ 2 ALASKA               REPUBLICAN     3     3
+ 3 ARIZONA              REPUBLICAN    11    11
+ 4 ARKANSAS             REPUBLICAN     6     6
+ 5 CALIFORNIA           DEMOCRAT      54    54
+ 6 COLORADO             REPUBLICAN    10    10
+ 7 CONNECTICUT          DEMOCRAT       7     7
+ 8 DELAWARE             DEMOCRAT       3     3
+ 9 DISTRICT OF COLUMBIA DEMOCRAT      NA    NA
+10 FLORIDA              REPUBLICAN    30    30
+# ℹ 41 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>proportional_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 51 × 3
+   state                democrat_ecv republican_ecv
+   &lt;chr&gt;                       &lt;dbl&gt;          &lt;dbl&gt;
+ 1 ALABAMA                         4              5
+ 2 ALASKA                          1              2
+ 3 ARIZONA                         5              6
+ 4 ARKANSAS                        3              3
+ 5 CALIFORNIA                     29             22
+ 6 COLORADO                        4              5
+ 7 CONNECTICUT                     4              3
+ 8 DELAWARE                        2              1
+ 9 DISTRICT OF COLUMBIA           NA             NA
+10 FLORIDA                        15             15
+# ℹ 41 more rows</code></pre>
+</div>
+</div>
+<ol start="4" type="1">
+<li>Let’s Visualize the Results:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for WTA and Proportional allocation schemes</span></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>wta_results <span class="ot">&lt;-</span> wta_results <span class="sc">%&gt;%</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Scheme =</span> <span class="st">"WTA"</span>, <span class="at">Democrat_ECV =</span> <span class="fu">ifelse</span>(Winner <span class="sc">==</span> <span class="st">"DEMOCRAT"</span>, ecv, <span class="dv">0</span>), <span class="at">Republican_ECV =</span> <span class="fu">ifelse</span>(Winner <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>, ecv, <span class="dv">0</span>))</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>proportional_results <span class="ot">&lt;-</span> proportional_results <span class="sc">%&gt;%</span></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Scheme =</span> <span class="st">"Proportional"</span>)</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the datasets</span></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>combined_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>  wta_results <span class="sc">%&gt;%</span> <span class="fu">select</span>(state, Scheme, Democrat_ECV, Republican_ECV),</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>  proportional_results <span class="sc">%&gt;%</span> <span class="fu">select</span>(state, Scheme, <span class="at">Democrat_ECV =</span> democrat_ecv, <span class="at">Republican_ECV =</span> republican_ecv)</span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape data for ggplot</span></span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>combined_long <span class="ot">&lt;-</span> combined_results <span class="sc">%&gt;%</span></span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(Democrat_ECV, Republican_ECV), <span class="at">names_to =</span> <span class="st">"Party"</span>, <span class="at">values_to =</span> <span class="st">"ECV"</span>)</span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot for comparing WTA and Proportional allocation</span></span>
+<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(combined_long, <span class="fu">aes</span>(<span class="at">x =</span> state, <span class="at">y =</span> ECV, <span class="at">fill =</span> Party)) <span class="sc">+</span></span>
+<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"stack"</span>) <span class="sc">+</span></span>
+<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Scheme, <span class="at">ncol=</span><span class="dv">1</span>,  <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span>  <span class="co"># Facet by Scheme to compare WTA and Proportional</span></span>
+<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Democrat_ECV"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Republican_ECV"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb58-27"><a href="#cb58-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb58-28"><a href="#cb58-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"ECV Allocation Comparison by Scheme"</span>, <span class="at">x =</span> <span class="st">"State"</span>, <span class="at">y =</span> <span class="st">"ECVs"</span>) <span class="sc">+</span></span>
+<span id="cb58-29"><a href="#cb58-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb58-30"><a href="#cb58-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis</span>(<span class="at">discrete =</span> <span class="cn">TRUE</span>, <span class="at">option =</span> <span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp03_files/figure-html/fig-width- 40, fig-height- 30-1.png" class="img-fluid figure-img">{#fig-width: 40, fig-height: 30 width=672}</p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>As shown in these graphs, there is a noticeable difference between the two allocation methods. The Proportional approach provides a more balanced distribution of Electoral College Votes (ECVs) for each party, reflecting the actual proportion of votes received. In contrast, the Winner-Takes-All (WTA) method results in a more polarized outcome, with states like California and Texas allocating all of their ECVs to a single party, regardless of close vote margins.</em></p>
+<p>Thank you.</p>
 
 
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->

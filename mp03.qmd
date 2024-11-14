@@ -5,7 +5,7 @@ editor: visual
 
 # Introduction
 
-Welcome to Mini Project 03 ..........KEEP WRITING
+Welcome to Mini Project 03. This project focuses on analyzing voting patterns and political trends in U.S. elections from 1976 to 2022. By examining data across multiple election cycles, this analysis aims to uncover shifts in voter behavior, partisan changes, and regional dynamics over time. We will look into both presidential and congressional election results, highlighting key trends and outcomes that have shaped the political landscape.
 
 # **Data I: US House Election Votes from 1976 to 2022**
 
@@ -35,7 +35,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 The following code shows how to download the U.S. House 1979- 2022 database.
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 get_ushouse_file <- function(){
     # The complete URL for direct file download using the fileId parameter
     FILE_URL <- "https://dataverse.harvard.edu/api/access/datafile/8963860"
@@ -66,7 +66,7 @@ head(ushouse_data)
 
 Note that this time, we'll read the CSV file directly from our repository, not from the website.
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 # Install and load the readr package if it's not already installed
 if (!requireNamespace("readr", quietly = TRUE)) {
     install.packages("readr")
@@ -115,7 +115,7 @@ require(sf)
 
 The following code shows how to download the Congressional Shapefiles.
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 library(httr)
 library(sf)
 
@@ -191,7 +191,7 @@ Download congressional shapefiles from the US Census Bureau for all US Congresse
 
 Grouping by years:
 
-```{r, cache=TRUE, error=TRUE}
+```{r, cache=FALSE, error=TRUE}
 
 
 # Load necessary libraries
@@ -273,7 +273,7 @@ download_and_unzip_shapefiles(shapefiles_to_download)
 
 Reading one of the shapefiles to make sure information has been correctly downloaded.
 
-```{r, cache=TRUE, error=TRUE}
+```{r, cache=FALSE, error=TRUE, message=FALSE}
 # Define the path to the shapefile
 shapefile_path <- file.path(unzip_dir, "tl_2020_us_cd116.shp")
 
@@ -384,13 +384,13 @@ View(ushouse_data)
 
 </details>
 
-### 3.2 New York State Fusion Parties Analysis. 
+### 3.2 New York State Fusion Parties Analysis.
 
 2.  New York State has a unique “fusion” voting system where one candidate can appear on multiple “lines” on the ballot and their vote counts are totaled. For instance, in 2022, Jerrold Nadler appeared on both the Democrat and Working Families party lines for NYS’ 12th Congressional District. He received 200,890 votes total (184,872 as a Democrat and 16,018 as WFP), easily defeating Michael Zumbluskas, who received 44,173 votes across three party lines (Republican, Conservative, and Parent).
 
     Are there any elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes their received from their “major party line” (Democrat or Republican) and not their total number of votes across all lines?
 
-    ```{r, cache=TRUE, error=TRUE}
+    ```{r, cache=FALSE, error=TRUE}
 
     library(dplyr)
     library(knitr)
@@ -437,7 +437,7 @@ View(ushouse_data)
 
     *Per the results, in our data analysis, **yes, there are elections that would have had a different outcome if the candidate was running only under one party.***
 
-### 3.3 Analysis of different trends. 
+### 3.3 Analysis of different trends.
 
 3.  Do presidential candidates tend to run ahead of or run behind congressional candidates in the same state? That is, does a Democratic candidate for president tend to get more votes in a given state than all Democratic congressional candidates in the same state?
 
@@ -447,7 +447,7 @@ View(ushouse_data)
 
     <summary>Code to summarize the number of votes for US House and Presidential</summary>
 
-```{r, cache=TRUE, error=TRUE}
+```{r, cache=FALSE, error=TRUE}
 
 # Summarize presidential votes (1976-2012)
 presidential_votes <- uspresident_data %>%
@@ -480,7 +480,7 @@ vote_comparison <- vote_comparison %>%
 
 </details>
 
-#### Table showing the difference between the % of voters for Presidents vs. Congress. 
+#### Table showing the difference between the % of voters for Presidents vs. Congress.
 
 ```{r}
 
@@ -518,7 +518,7 @@ The analysis is very similar as the previous one, but now we need to group by st
 
 <summary>Code to summarize the number of votes per state for US House and Presidential</summary>
 
-```{r, cache=TRUE, error=TRUE}
+```{r, cache=FALSE, error=TRUE}
 
 # Summarize presidential votes (1976-2012)
 state_presidential_votes <- uspresident_data %>%
@@ -567,7 +567,7 @@ In this analysis, we'll take in consideration the party per year.
 
 <summary>Code to summarize the number of votes per state for US House and Presidential</summary>
 
-```{r, cache=TRUE, error=TRUE}
+```{r, cache=FALSE, error=TRUE}
 
 library(ggplot2)
 library(dplyr)
@@ -619,7 +619,7 @@ ggplot(vote_long, aes(x = "", y = percentage, fill = party)) +
 
 *As we can see in these pie charts over the years, in 1992, the Republican Party lost votes to other parties. However, in 2012, the contest was very close between the Democratic and Republican parties.*
 
-# Importing and Plotting Shape File Data 
+# Importing and Plotting Shape File Data
 
 ### Task 4: Automate Zip File Extraction
 
@@ -679,9 +679,9 @@ ggplot(nyc_sf,
 
 <details>
 
-<summary>Code to download and unzip the file for State Boundaries and analyze this file with the US Presidential dataset. </summary>
+<summary>Code to download and unzip the file for State Boundaries and analyze this file with the US Presidential dataset.</summary>
 
-```{r, cache=TRUE, error=TRUE}
+```{r, cache=FALSE, error=TRUE}
 
 library(ggplot2)
 library(sf)
@@ -761,44 +761,120 @@ ggplot(data = states_sf) +
 
 # Task 6: **Advanced Chloropleth Visualization of Electoral College Results**
 
-```{r, cache=TRUE, error=TRUE}
+<details>
 
-# Load libraries
-library(ggplot2)
+<summary>Code to download and unzip the file for State Boundaries and analyze this file with the US Presidential dataset.</summary>
+
+```{r, message=FALSE, warning=FALSE}
+safe_download <- function(url, destfile) {
+  if (!file.exists(destfile)) {
+    tryCatch(download.file(url, destfile, mode = "wb"),
+             error = function(e) warning("Failed to download ", url))
+  }
+}
+
+safe_download("https://drive.usercontent.google.com/uc?id=1tkRPPYIKpOICUdO1eJfrHAnHhF7RSorG&export=download", "cb_2018_us_cd116_5m.zip")
+
+
+##-
+td <- tempdir(); 
+zip_contents <- unzip("cb_2018_us_cd116_5m.zip", 
+                      exdir = td)
+    
+fname_shp <- zip_contents[grepl("shp$", zip_contents)]
+fname_dbf <- zip_contents[grepl("dbf$", zip_contents)]
+fname_shx <- zip_contents[grepl("shx$", zip_contents)]
+
+
+# Load the shapefile
+shapefile_path <- "cb_2018_us_cd116_5m.shp"
+us_sf <- read_sf(fname_shp)
+us_sf
+```
+
+</details>
+
+#### **Advanced Chloropleth Visualization of Electoral College Results (2000)**
+
+```{r, message=FALSE, warning=FALSE}
+
+# Create the repeated data for animation
+us_sf_repeats <- bind_rows(
+    us_sf |> mutate(value = rnorm(441), frame = 1), 
+    us_sf |> mutate(value = rnorm(441), frame = 2), 
+    us_sf |> mutate(value = rnorm(441), frame = 3), 
+    us_sf |> mutate(value = rnorm(441), frame = 4), 
+    us_sf |> mutate(value = rnorm(441), frame = 5)
+)
+bbox <- st_bbox(us_sf)
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Create the plot with adjusted scaling and color
+ library(ggplot2)
+library(sf)
+library(gganimate)
+#install.packages("viridis")
+library(viridis)
+
+bbox <- st_bbox(us_sf_repeats) # Set bounding box based on spatial data
+
+# Plot with adjusted scaling, color, and title
+ggplot(us_sf_repeats, aes(geometry = geometry, fill = value)) + 
+  geom_sf() + 
+  transition_time(frame) + 
+  scale_fill_viridis_c(option = "magma") +   
+  theme_minimal(base_size = 14) +            
+  labs(
+    title = "US Election results (2000)",
+    fill = "Votes"
+  ) + 
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(size = 18)
+  ) +
+  coord_sf(
+    xlim = c(-130, -60),  
+    ylim = c(20, 50),     
+    expand = FALSE
+  )
+
+```
+
+# Evaluating Fairness of ECV Allocation Schemes 
+
+### Task 7: Evaluating Fairness of ECV Allocation Schemes
+
+Write a fact check evaluating the fairness of the different ECV electoral allocation schemes. To do so, you should first determine which allocation scheme you consider “fairest”.
+
+#### Analysis and Background: 
+
+ECV stands for **Effective Closeness Voting**, a voting method that focuses on fairness and how votes are allocated in a way that reflects the preferences of the voters. It is often used in the context of proportional representation or electoral systems that aim to allocate seats or power in a way that matches voter preferences.
+
+The **Proportional Representation** scheme seems to be the fairest, as it allocates ECVs based on the actual proportion of votes each candidate receives, thereby more closely reflecting the will of the people. The **Winner-Takes-All system**, while simpler, can lead to outcomes that don't reflect the majority’s preference, as seen in the **2000 election**.
+
+On this analysis, we'll compare the "Winner-Takes -All (WTA) scheme, versus the Proportional Representation.
+
+1.  First we need a summarized view of the elections results in 2000, per party and the winner for each state.
+
+```{r}
+
 library(dplyr)
 library(tidyr)
-library(sf)
 
-# Download and read the shapefile
-if(!file.exists("state_boundaries.zip")){
-  download.file("https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_500k.zip", 
-                destfile="state_boundaries.zip")
-}
-
-read_shp_from_zip <- function(zip_file) {
-  td <- tempdir()  
-  zip_contents <- unzip(zip_file, exdir = td)
-  fname_shp <- zip_contents[grepl("shp$", zip_contents)]
-  states_sf <- st_read(fname_shp)
-  return(states_sf)
-}
-
-states_sf <- read_shp_from_zip("state_boundaries.zip") %>%
-  rename(state = NAME) %>%
-  mutate(state = toupper(state))
-
-# Prepare election data over multiple years
-election_summary <- uspresident_data %>%
-  filter(party_detailed %in% c("DEMOCRAT", "REPUBLICAN")) %>%
-  group_by(year, state, party_detailed) %>%
+# Filter for the 2000 election and focus on the Democratic and Republican parties
+presidentvotes2000_summary <- uspresident_data %>%
+  filter(year == 2000, party_detailed %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+  group_by(state, party_detailed) %>%
   summarise(candidatevotes = sum(candidatevotes), .groups = "drop") %>%
   pivot_wider(names_from = party_detailed, values_from = candidatevotes, values_fill = list(candidatevotes = 0)) %>%
   rename(Democratic_votes = DEMOCRAT, Republican_votes = REPUBLICAN) %>%
   left_join(
     uspresident_data %>%
-      select(year, state, totalvotes) %>%
+      filter(year == 2000) %>%
+      select(state, totalvotes) %>%
       distinct(),
-    by = c("year", "state")
+    by = "state"
   ) %>%
   mutate(
     Winner = case_when(
@@ -807,20 +883,112 @@ election_summary <- uspresident_data %>%
       TRUE ~ "TIE"
     )
   ) %>%
-  select(year, state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
-
-# Merge with shapefiles
-states_sf <- states_sf %>%
-  left_join(election_summary, by = "state")
-
-# Create the faceted plot
-ggplot(data = states_sf) +
-  geom_sf(aes(fill = Winner), color = "white") +
-  scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red", "TIE" = "gray")) +
-  theme_minimal() +
-  labs(title = "U.S. Presidential Election Results by State", fill = "Party") +
-  theme(legend.position = "bottom") +
-  coord_sf(xlim = c(-130, -65), ylim = c(24, 50), expand = FALSE) +
-  facet_wrap(~ year, ncol = 1)  # Facet by year with a single column for readability
+  select(state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
 
 ```
+
+2.  We need to create the function for both approaches: WTA and Proportional.
+
+```{r}
+
+#load the ecv data CSV Manually created, after exploration
+state_ecv_data <- read.csv("C:/Users/krisf/OneDrive/Documentos/STA9750-2024-FALL/ECVs.csv")
+
+#Winner-Takse -All function
+calculate_wta <- function(data, state_ecv_data) {
+  data <- data %>%
+    left_join(state_ecv_data, by = "state") %>%
+    mutate(ecv = ifelse(Winner == "DEMOCRAT", ECVs, 0) + ifelse(Winner == "REPUBLICAN", ECVs, 0)) %>%
+    select(state, Winner, ECVs, ecv)
+  return(data)
+}
+
+```
+
+```{r}
+
+#Proportional Representation approach
+
+calculate_proportional <- function(data, state_ecv_data) {
+  data <- data %>%
+    left_join(state_ecv_data, by = "state") %>%
+    mutate(
+      democrat_ecv = round((Democratic_votes / Total_votes) * ECVs),
+      republican_ecv = round((Republican_votes / Total_votes) * ECVs)
+    ) %>%
+    select(state, democrat_ecv, republican_ecv)
+  return(data)
+}
+
+```
+
+3.  Setting up the Electoral College Votes (ECVs) per state.
+
+```{r}
+
+# Calculate the results under each scheme
+wta_results <- calculate_wta(presidentvotes2000_summary, state_ecv_data)
+proportional_results <- calculate_proportional(presidentvotes2000_summary, state_ecv_data)
+
+# You can now compare the results
+wta_results
+proportional_results
+
+
+
+```
+
+3.  Now, we need to apply the schemes and compare the results.
+
+```{r}
+  
+# Calculate the results under each scheme
+wta_results <- calculate_wta(presidentvotes2000_summary, state_ecv_data)
+proportional_results <- calculate_proportional(presidentvotes2000_summary, state_ecv_data)
+
+# You can now compare the results
+
+wta_results
+proportional_results
+
+```
+
+4.  Let's Visualize the Results:
+
+```{r, fig-width: 40, fig-height: 30}
+library(ggplot2)
+library(dplyr)
+library(viridis)
+
+# Prepare data for WTA and Proportional allocation schemes
+wta_results <- wta_results %>%
+  mutate(Scheme = "WTA", Democrat_ECV = ifelse(Winner == "DEMOCRAT", ecv, 0), Republican_ECV = ifelse(Winner == "REPUBLICAN", ecv, 0))
+
+proportional_results <- proportional_results %>%
+  mutate(Scheme = "Proportional")
+
+# Combine the datasets
+combined_results <- bind_rows(
+  wta_results %>% select(state, Scheme, Democrat_ECV, Republican_ECV),
+  proportional_results %>% select(state, Scheme, Democrat_ECV = democrat_ecv, Republican_ECV = republican_ecv)
+)
+
+# Reshape data for ggplot
+combined_long <- combined_results %>%
+  pivot_longer(cols = c(Democrat_ECV, Republican_ECV), names_to = "Party", values_to = "ECV")
+
+# Plot for comparing WTA and Proportional allocation
+ggplot(combined_long, aes(x = state, y = ECV, fill = Party)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~ Scheme, ncol=1,  scales = "free_y") +  # Facet by Scheme to compare WTA and Proportional
+  scale_fill_manual(values = c("Democrat_ECV" = "blue", "Republican_ECV" = "red")) +
+  theme_minimal() +
+  labs(title = "ECV Allocation Comparison by Scheme", x = "State", y = "ECVs") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_fill_viridis(discrete = TRUE, option = "C")
+
+```
+
+*As shown in these graphs, there is a noticeable difference between the two allocation methods. The Proportional approach provides a more balanced distribution of Electoral College Votes (ECVs) for each party, reflecting the actual proportion of votes received. In contrast, the Winner-Takes-All (WTA) method results in a more polarized outcome, with states like California and Texas allocating all of their ECVs to a single party, regardless of close vote margins.*
+
+Thank you.
