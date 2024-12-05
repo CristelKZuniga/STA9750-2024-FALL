@@ -1,0 +1,851 @@
+---
+title: "Monte Carlo- Informed Selection of CUNY Retirement Plan"
+author: "Cristel Zuniga"
+editor: visual
+---
+
+# Introduction
+
+Welcome to Mini Project 04. The purpose of this project is to provide financial advise to the CUNY faculty members in order to decide the which retirement plan is the best option. This analysis will be tested and analyzed under the Monte - Carlo approach, which is playing the game many times and collecting the results to compute the most accurate prediction, the same principles will apply to this analysis by using historical economic data and a bootstrap re sampling strategy to see the distribution of retirement outcomes under different economic histories.
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+```
+
+```{r warning=FALSE, message=FALSE}
+install.packages("httr")
+install.packages("jsonlite")
+install.packages("httr2")
+```
+
+# Task 3: Data Acquisition
+
+### Wage Growth historical data:
+
+Code to obtain the Wage growth from FREED using the API Key, which will show the Employment Cost Index (ECI) for Wages and Salaries per Quarter (Note that we will need to interpolate the data since all the other data sets are monthly presented).
+
+```{r}
+
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(lubridate)
+
+# Read the API key from a text file
+api_key <- readLines("freed_key.txt", warn = FALSE) 
+
+series_id <- "ECIWAG"
+
+base_url <- "https://api.stlouisfed.org/fred/series/observations"
+
+# Set up the query parameters for quarterly data
+params <- list(
+  series_id = series_id,
+  api_key = api_key,
+  file_type = "json",
+  frequency = "q" 
+)
+
+# Send the GET request
+response <- GET(base_url, query = params)
+
+if (status_code(response) == 200) {
+  # Parse the JSON content into a list
+  json_data <- fromJSON(content(response, as = "text"))
+  
+  # Extract observations as a data frame
+  observations <- data.frame(json_data$observations) %>%
+    mutate(date = as.Date(date),  # Ensure the date is in Date format
+           value = as.numeric(value))  # Convert value to numeric
+  
+  # Save the quarterly data
+  write.csv(observations, "quarterly_wage_growth_data.csv", row.names = FALSE)
+  
+  print("Quarterly data saved. Proceeding to interpolation.")
+} else {
+  stop(paste("Error:", status_code(response), "Message:", content(response, as = "text")))
+}
+
+
+```
+
+The next step is to interpolate quarterly data to Monthly frequency:
+
+```{r}
+library(dplyr)
+library(lubridate)
+
+# Ensure the date column is in Date format
+observations$date <- as.Date(observations$date)
+
+# Check if there are any NA values
+if (sum(is.na(observations$date)) > 0) {
+  observations <- observations %>%
+    filter(!is.na(date))  # Remove rows with NA dates
+}
+
+# Interpolation to Monthly Frequency
+monthly_data <- data.frame(
+  date = seq(from = min(observations$date, na.rm = TRUE),
+             to = max(observations$date, na.rm = TRUE),
+             by = "month")  # Generate monthly sequence
+) %>%
+  mutate(value = approx(x = as.numeric(observations$date),
+                        y = observations$value,
+                        xout = as.numeric(date))$y)  # Interpolate values
+
+
+monthly_data <- monthly_data %>%
+   rename(wage_growth = value)
+
+# Save the interpolated monthly data
+write.csv(monthly_data, "monthly_wage_growth_data.csv", row.names = FALSE)
+
+# View the first few rows
+#head(monthly_data, 100)
+
+monthly_data |> DT::datatable()
+```
+
+### US Equity historical data:
+
+Code to obtain the US Equity Market Total Returns from Alpha Vantage, using the data set: TIME_SERIES_MONTHLY_ADJUSTED, and using S&P as equity source:
+
+```{r}
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+# Read the API key from the file
+api_key <- readLines("alpha_key.txt", warn = FALSE)
+
+# Construct the API request URL
+base_url <- "https://www.alphavantage.co/query"
+params <- list(
+  `function` = "TIME_SERIES_MONTHLY_ADJUSTED",
+  symbol = "SPY", 
+  apikey = api_key
+)
+
+# Send the request
+response <- GET(url = base_url, query = params)
+
+# Check the response status
+if (status_code(response) == 200) {
+  # Parse the content as JSON
+  content <- fromJSON(content(response, as = "text"))
+  
+  # Extract the "Monthly Adjusted Time Series" part
+  time_series <- content$`Monthly Adjusted Time Series`
+  
+  # Convert the time series into a data frame
+  time_series_df <- as.data.frame(do.call(rbind, time_series))
+  
+  # Add dates as a column (rownames are the dates in this case)
+  time_series_df <- time_series_df %>%
+    mutate(date = rownames(time_series_df)) %>%
+    select(date, everything())  # Move date to the first column
+  
+  # Reset rownames
+  rownames(time_series_df) <- NULL
+  
+  # Rename columns to clean names
+  colnames(time_series_df) <- c(
+    "date", "open", "high", "low", "close", "adjusted_close", "volume", "dividend_amount"
+  )
+  
+  # Convert columns to appropriate data types
+  time_series_df <- time_series_df %>%
+    mutate(
+      date = as.Date(date),
+      across(c(open, high, low, close, adjusted_close, volume, dividend_amount), as.numeric)
+    )
+  
+  # Calculate total return
+  time_series_df <- time_series_df %>%
+    mutate(
+      us_total_return = (lead(adjusted_close) - adjusted_close + lead(dividend_amount)) / adjusted_close
+    )
+  
+  # Save the tidy data to a CSV file
+  us_monthly_total_returns_file <- "us_monthly_total_returns_tidy.csv"
+  write.csv(time_series_df, us_monthly_total_returns_file, row.names = FALSE)
+  
+  print(paste("Data saved to", us_monthly_total_returns_file))
+  
+  # Preview the first few rows of the data frame
+  head(time_series_df, 5)
+  
+} else {
+  # Print error message if the request failed
+  print(paste("Error:", status_code(response)))
+}
+
+
+```
+
+### Consumer Price Index (CPI) Inflation rate
+
+Code to obtain the average change in the consumer price index over time, in this case by month.
+
+```{r}
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+api_key <- readLines("freed_key.txt", warn = FALSE)
+
+# Define the series ID for CPI (Consumer Price Index)
+series_id <- "CPIAUCSL"
+
+base_url <- "https://api.stlouisfed.org/fred/series/observations"
+
+# Set up the query parameters
+params <- list(
+  series_id = series_id,
+  api_key = api_key,
+  file_type = "json"
+)
+
+# Send the request
+response <- GET(base_url, query = params)
+
+# Check the response status
+if (status_code(response) == 200) {
+  # Parse the content as JSON
+  json_data <- fromJSON(content(response, as = "text"))
+  
+  # Extract observations into a data frame
+  observations <- json_data$observations
+  
+  # Convert observations to a data frame
+  inflation_df <- as.data.frame(observations)
+  
+  # Rename columns for clarity
+  colnames(inflation_df) <- c("realtime_start", "realtime_end", "date", "inflation_rate")
+  
+  # Convert data types
+  inflation_df <- inflation_df %>%
+    mutate(
+      date = as.Date(date),
+      inflation_rate = as.numeric(inflation_rate)
+    )
+
+  # Check for any issues with the value column
+  print(sum(is.na(inflation_df$inflation_rate)))  # Check for NAs
+  print(head(inflation_df))  # View the first few rows
+
+  # Rename the value column to inflation_rate
+  #inflation_df <- inflation_df %>%
+    #rename(inflation_rate = value)
+  
+  # Save the tidy data to a CSV file
+  inflation_file <- "tidy_inflation_rates.csv"
+  write.csv(inflation_df, file = inflation_file, row.names = FALSE)
+  
+  print(paste("Data saved to", inflation_file))
+  
+  # Preview the first few rows of the data frame
+  head(inflation_df)
+  
+} else {
+  # Print error message if the request failed
+  print(paste("Error:", status_code(response)))
+}
+
+```
+
+### International Equity Market Total Returns
+
+Code to obtain the US Equity Market Total Returns from Alpha Vantage, using the data set: TIME_SERIES_MONTHLY_ADJUSTED, and using VXUS (Vanguard Total International Stock ETF as equity source:
+
+```{r}
+
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+# Read the API key from the file
+api_key <- readLines("alpha_key.txt", warn = FALSE)
+
+# Construct the API request URL
+base_url <- "https://www.alphavantage.co/query"
+params <- list(
+  `function` = "TIME_SERIES_MONTHLY_ADJUSTED",
+  symbol = "VXUS", 
+  apikey = api_key
+)
+
+# Send the request
+response <- GET(url = base_url, query = params)
+
+# Check the response status
+if (status_code(response) == 200) {
+  # Parse the content as JSON
+  content <- fromJSON(content(response, as = "text"))
+  
+  # Extract the "Monthly Adjusted Time Series" part
+  time_series <- content$`Monthly Adjusted Time Series`
+  
+  # Convert the time series into a data frame
+  time_series_df <- as.data.frame(do.call(rbind, time_series))
+  
+  # Add dates as a column (rownames are the dates in this case)
+  time_series_df <- time_series_df %>%
+    mutate(date = rownames(time_series_df)) %>%
+    select(date, everything())  # Move date to the first column
+  
+  # Reset rownames
+  rownames(time_series_df) <- NULL
+  
+  # Rename columns to clean names
+  colnames(time_series_df) <- c(
+    "date", "open", "high", "low", "close", "adjusted_close", "volume", "dividend_amount"
+  )
+  
+  # Convert columns to appropriate data types
+  time_series_df <- time_series_df %>%
+    mutate(
+      date = as.Date(date),
+      across(c(open, high, low, close, adjusted_close, volume, dividend_amount), as.numeric)
+    )
+
+# Replace NAs with zeroes or a small positive value
+time_series_df <- time_series_df %>%
+  mutate(
+    adjusted_close = ifelse(is.na(adjusted_close) | adjusted_close == 0, NA, adjusted_close),
+    dividend_amount = ifelse(is.na(dividend_amount), 0, dividend_amount)
+  )
+
+    
+  # Calculate total return
+  time_series_df <- time_series_df %>%
+  mutate(
+    int_total_return = ifelse(
+      is.na(adjusted_close) | is.na(lead(adjusted_close)),
+      NA,
+      (lead(adjusted_close) - adjusted_close + lead(dividend_amount)) / adjusted_close
+    )
+  )
+  
+  # Save the tidy data to a CSV file
+  international_monthly_total_returns_file <- "interantional_monthly_total_returns_tidy.csv"
+  write.csv(time_series_df, international_monthly_total_returns_file, row.names = FALSE)
+  
+  print(paste("Data saved to", international_monthly_total_returns_file))
+  
+  # Preview the first few rows of the data frame
+  summary(time_series_df$int_total_return)
+  head(time_series_df, 5)
+  
+} else {
+  # Print error message if the request failed
+  print(paste("Error:", status_code(response)))
+}
+
+
+```
+
+### Bond Market Total Returns
+
+Code to obtain the US Equity Market Total Returns from Alpha Vantage, using the data set: TIME_SERIES_MONTHLY_ADJUSTED, and using bond ETFs as proxies for the bond returns "BND" Vanguard Total Bond Market:
+
+```{r}
+
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+# Read the API key from the file
+api_key <- readLines("alpha_key.txt", warn = FALSE)
+
+# Construct the API request URL
+base_url <- "https://www.alphavantage.co/query"
+params <- list(
+  `function` = "TIME_SERIES_MONTHLY_ADJUSTED",
+  symbol = "BND", 
+  apikey = api_key
+)
+
+# Send the request
+response <- GET(url = base_url, query = params)
+
+# Check the response status
+if (status_code(response) == 200) {
+  # Parse the content as JSON
+  content <- fromJSON(content(response, as = "text"))
+  
+  # Extract the "Monthly Adjusted Time Series" part
+  time_series <- content$`Monthly Adjusted Time Series`
+  
+  # Convert the time series into a data frame
+  time_series_df <- as.data.frame(do.call(rbind, time_series))
+  
+  # Add dates as a column (rownames are the dates in this case)
+  time_series_df <- time_series_df %>%
+    mutate(date = rownames(time_series_df)) %>%
+    select(date, everything())  # Move date to the first column
+  
+  # Reset rownames
+  rownames(time_series_df) <- NULL
+  
+  # Rename columns to clean names
+  colnames(time_series_df) <- c(
+    "date", "open", "high", "low", "close", "adjusted_close", "volume", "dividend_amount"
+  )
+  
+  # Convert columns to appropriate data types
+  time_series_df <- time_series_df %>%
+    mutate(
+      date = as.Date(date),
+      across(c(open, high, low, close, adjusted_close, volume, dividend_amount), as.numeric)
+    )
+  
+  # Calculate total return
+  time_series_df <- time_series_df %>%
+    mutate(
+      bond_total_return = (lead(adjusted_close) - adjusted_close + lead(dividend_amount)) / adjusted_close
+    )
+  
+  # Save the tidy data to a CSV file
+  bond_monthly_total_returns_file <- "bond_monthly_total_returns_tidy.csv"
+  write.csv(time_series_df, bond_monthly_total_returns_file, row.names = FALSE)
+  
+  print(paste("Data saved to", bond_monthly_total_returns_file))
+  
+  # Preview the first few rows of the data frame
+  head(time_series_df, 5)
+  
+} else {
+  # Print error message if the request failed
+  print(paste("Error:", status_code(response)))
+}
+
+
+```
+
+Now, last step is to centralize all these data sets in a **single master data se**t, using "date" as the joining key, and filtering to only analyze data from 2009 to 2024 (15 years).
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(lubridate)
+
+# Load data sets and preprocess
+wage_data <- read.csv("monthly_wage_growth_data.csv") %>%
+  mutate(date = as.Date(date),  
+         date = ceiling_date(date, "month") - days(1)) %>%  # Adjust to end of month
+  filter(date >= as.Date("2009-01-01") & date <= as.Date("2024-12-31"))  # Filter dates
+
+us_total_returns_data <- read.csv("us_monthly_total_returns_tidy.csv") %>%
+  mutate(date = as.Date(date),  
+         date = ceiling_date(date, "month") - days(1)) %>%
+  filter(date >= as.Date("2009-01-01") & date <= as.Date("2024-12-31"))  # Filter dates
+
+international_total_returns_data <- read.csv("interantional_monthly_total_returns_tidy.csv") %>%
+  mutate(date = as.Date(date),  
+         date = ceiling_date(date, "month") - days(1)) %>%
+  filter(date >= as.Date("2009-01-01") & date <= as.Date("2024-12-31"))  # Filter dates
+
+bond_total_returns_data <- read.csv("bond_monthly_total_returns_tidy.csv") %>%
+  mutate(date = as.Date(date),  
+         date = ceiling_date(date, "month") - days(1)) %>%
+  filter(date >= as.Date("2009-01-01") & date <= as.Date("2024-12-31"))  # Filter dates
+
+inflation_data <- read.csv("tidy_inflation_rates.csv") %>%
+  mutate(date = as.Date(date),  
+         date = ceiling_date(date, "month") - days(1)) %>%
+  filter(date >= as.Date("2009-01-01") & date <= as.Date("2024-12-31"))  # Filter dates
+
+# Remove duplicates (if any)
+wage_data <- wage_data %>% distinct(date, .keep_all = TRUE)
+us_total_returns_data <- us_total_returns_data %>% distinct(date, .keep_all = TRUE)
+international_total_returns_data <- international_total_returns_data %>% distinct(date, .keep_all = TRUE)
+bond_total_returns_data <- bond_total_returns_data %>% distinct(date, .keep_all = TRUE)
+inflation_data <- inflation_data %>% distinct(date, .keep_all = TRUE)
+
+# Check if dates align
+print(length(unique(wage_data$date)))
+print(length(unique(us_total_returns_data$date)))
+print(length(unique(international_total_returns_data$date)))
+print(length(unique(bond_total_returns_data$date)))
+print(length(unique(inflation_data$date)))
+
+# Joining data
+master_data <- us_total_returns_data %>%
+  left_join(wage_data, by = "date") %>%
+  left_join(international_total_returns_data, by = "date") %>%
+  left_join(bond_total_returns_data, by = "date") %>%
+  left_join(inflation_data, by = "date")
+
+# Replace missing values with 0 only for numeric columns
+master_data <- master_data %>%
+  mutate(across(where(is.numeric), ~ ifelse(is.na(.), 0, .)))
+
+# Select only the important columns
+final_master_data <- master_data %>%
+  select(date, us_total_return, int_total_return, bond_total_return, inflation_rate, wage_growth)
+
+# View the modified data frame
+head(final_master_data)
+
+```
+
+# Task 4: Initial Analysis
+
+## Summarizing, Basic Statistics:
+
+```{r}
+# Basic summary of the data
+summary_stats <- summary(final_master_data)
+
+# Load the knitr package to render the table nicely
+library(knitr)
+
+# Print the summary stats as a nicely formatted table
+kable(summary_stats, caption = "Summary of Final Master Data")
+
+```
+
+```{r}
+
+sd(final_master_data$us_total_return, na.rm = TRUE)
+sd(final_master_data$int_total_return, na.rm = TRUE)
+sd(final_master_data$bond_total_return, na.rm = TRUE)
+sd(final_master_data$wage_growth, na.rm = TRUE)
+
+range(final_master_data$inflation_rate, na.rm = TRUE)  # Range of inflation rate
+
+
+
+```
+
+## Correlation Analysis:
+
+Here we'll use the correlation function to understand the relationship between the US Total return, Inflation rate and Wage growth:
+
+```{r}
+
+library(knitr)
+# Compute correlation matrix for several variables
+kable(cor(final_master_data[, c("us_total_return", "inflation_rate", "wage_growth")], use = "complete.obs"))
+
+```
+
+## Visualizing the Data of these relationships:
+
+Scatter plot:
+
+```{r}
+# Scatter plot to see the relationship between US total return and inflation rate
+plot(master_data$us_total_return, master_data$inflation_rate,
+     xlab = "US Total Return", ylab = "Inflation Rate",
+     main = "Scatter plot: US Total Return vs Inflation Rate")
+
+```
+
+Correlation heat map between the US Total return, Inflation Rate and Wage Growth :
+
+```{r}
+library(ggplot2)
+#install.packages("reshape2")
+library(reshape2)
+
+# Select relevant columns
+cor_data <- final_master_data[, c("us_total_return", "inflation_rate", "wage_growth")]
+
+# Compute the correlation matrix
+cor_matrix <- cor(cor_data, use = "complete.obs")
+
+# Convert the correlation matrix into a long format for ggplot
+cor_matrix_melted <- melt(cor_matrix)
+
+# Plot the correlation heatmap
+ggplot(cor_matrix_melted, aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "red", high = "green", mid = "white", midpoint = 0) +
+  theme_minimal() +
+  labs(title = "Correlation Heatmap", x = "Variables", y = "Variables")
+
+```
+
+## Time-Series Visualizations of each variable: 
+
+```{r}
+
+library(lubridate)
+library(tidyverse) 
+library(patchwork) # For combining plots
+library(knitr)
+
+# Plot individual time series
+plot1 <- ggplot(final_master_data, aes(x = date, y = wage_growth)) +
+  geom_line(color = "blue") +
+  labs(title = "Wage Growth Over Time", x = "Date", y = "Wage Growth (%)")
+
+plot2 <- ggplot(final_master_data, aes(x = date, y = us_total_return)) +
+  geom_line(color = "red") +
+  labs(title = "US Equity Over Time", x = "Date", y = "US Total Return (%)")
+
+plot3 <- ggplot(final_master_data, aes(x = date, y = int_total_return)) +
+  geom_line(color = "green") +
+  labs(title = "International Equity Market Returns", x = "Date", y = "Monthly Return (%)")
+
+plot4 <- ggplot(final_master_data, aes(x = date, y = bond_total_return)) +
+  geom_line(color = "orange") +
+  labs(title = "Bond Market Returns Over Time", x = "Date", y = "Monthly Return (%)")
+
+# Combine the plots
+plot1 + plot2 + plot3 + plot4 + plot_layout(ncol = 2)
+
+```
+
+## Calculating Long-Term Monthly Averages
+
+```{r}
+monthly_avg_data <- final_master_data %>%
+  mutate(month = format(date, "%Y-%m")) %>%
+  group_by(month) %>%
+  summarize(
+    avg_us_total_return = mean(us_total_return, na.rm = TRUE),
+    avg_int_total_return = mean(int_total_return, na.rm = TRUE),
+    avg_bond_total_return = mean(bond_total_return, na.rm = TRUE),
+    avg_inflation_rate = mean(inflation_rate, na.rm = TRUE),
+    avg_wage_growth = mean(wage_growth, na.rm = TRUE)
+  )
+
+head(monthly_avg_data)
+```
+
+# Task 5: Historical Comparison of TRS and ORP
+
+Analysis and comparison of the first month of retirement under TRS Model (Teachers Retirement System) and OPR (Optional Retirement Plan).
+
+Briefly explanation of each retirement plan:
+
+**TRS: Employees** pay a fixed percentage based on their annual salary and increases as follows:
+
+-   \$45,000 or less: 3%
+-   \$45,001 to \$55,000: 3.5%
+-   \$55,001 to \$75,000: 4.5%
+-   \$75,001 to \$100,000: 5.75%
+-   \$100,001 or more: 6%
+
+The retirement benefit is calculated on the Final Average Salary (calculated based on the final three years of salary), if N is the number of years served, the annual retirement benefit is calculated as below:
+
+-   1.67% \* FAS \* N if N \< 20
+-   1.75% \* FAS \* N if N = 20
+-   (35% + 2% \* N) \* FAS \* if N \> 20
+
+Finally, the benefit increases annually by 50% of the CPI rounded *up* to the nearest tenth of a percent.
+
+**ORP Employees:** For the purpose of this analysis we'll assume the following asset allocation:
+
+-   Age 25 to Age 49:
+    -   54% US Equities
+    -   36% International Equities
+    -   10% Bonds
+-   Age 50 to Age 59:
+    -   47% US Equities
+    -   32% International Equities
+    -   21% Bonds
+-   Age 60 to Age 74:
+    -   34% US Equities
+    -   23% International Equities
+    -   43% Bonds
+-   Age 75 or older:
+    -   19% US Equities
+    -   13% International Equities
+    -   62% Bonds
+    -   6% Short-Term Debt
+
+Both Employee and employer make a monthly contribution.
+
+Employee contribution:
+
+-   \$45,000 or less: 3%
+-   \$45,001 to \$55,000: 3.5%
+-   \$55,001 to \$75,000: 4.5%
+-   \$75,001 to \$100,000: 5.75%
+-   \$100,001 or more: 6%
+
+Employer contribution:
+
+-   8% for the first seven years of employment at CUNY.
+-   10% for all years thereafter.
+
+**Hypothetical employee data:**
+
+1.  Joined CUNY in January 2009
+
+2.  Retired from CUNY in November 2024
+
+Code for calculation of TRS and ORP:
+
+### Adjusting Inflation and Wage Growth rates:
+
+```{r}
+
+inflation_data$inflation_rate <- inflation_data$inflation_rate / 100
+summary(inflation_data$inflation_rate)
+head(inflation_data$inflation_rate)
+```
+
+```{r}
+wage_data$wage_growth <- wage_data$wage_growth / 100
+
+summary(wage_data$wage_growth)
+head(wage_data$wage_growth)
+
+```
+
+### Setting up starting salary and TRS Calculation 
+
+```{r}
+
+starting_salary <- 46000 
+working_time_yr <- as.numeric(difftime(max(final_master_data$date), min(final_master_data$date), units = "days")) / 365.25
+
+trs_calculation <- function(starting_salary, wage_data, inflation_data, years_of_service) {
+  # Initialize salary and a vector to hold yearly salaries
+  current_salary <- starting_salary
+  salary_history <- numeric(years_of_service)
+  
+  for (year in 1:years_of_service) {
+    # Get wage growth and inflation for the current year
+    growth_rate <- wage_data$wage_growth[year %% nrow(wage_data) + 1]
+    inflation_rate <- inflation_data$inflation_rate[year %% nrow(inflation_data) + 1]
+    
+    # Update salary
+    current_salary <- current_salary * (1 + growth_rate + inflation_rate)
+    salary_history[year] <- current_salary
+  }
+  
+  # Debug: Print salary history for verification
+  print(salary_history)
+  
+  # Calculate FAS using the last 3 years
+  fas <- mean(tail(salary_history, 3))
+  print(paste("Final Average Salary (FAS):", fas))  # Debug
+
+  # Pension calculation based on years worked
+  pension_factor <- ifelse(years_of_service < 20, 0.0167, 
+                           ifelse(years_of_service == 20, 0.0175, 0.35 + 0.02 * (years_of_service - 20)))
+  pension_amount <- pension_factor * fas * years_of_service
+  monthly_pension <- pension_amount / 12
+  return(monthly_pension)
+}
+
+```
+
+### OPR Calculation 
+
+```{r}
+orp_calculation <- function(starting_salary, wage_data, us_total_returns_data, bond_total_returns_data, years_of_service, employer_contribution_rate = 0.10, withdrawal_rate = 0.04) {
+  # Initialize salary and account balance
+  current_salary <- starting_salary
+  account_balance <- 0
+  
+  for (year in 1:years_of_service) {
+    # Get wage growth and market returns
+    growth_rate <- wage_data$wage_growth[year %% nrow(wage_data) + 1] 
+    equity_return <- us_total_returns_data$us_total_return[year %% nrow(us_total_returns_data) + 1]
+    bond_return <- bond_total_returns_data$bond_total_return[year %% nrow(bond_total_returns_data) + 1]
+    
+    # Weighted market return
+    market_return <- 0.6 * equity_return + 0.4 * bond_return
+    
+    # Update salary
+    current_salary <- current_salary * (1 + growth_rate)
+    
+    # Contributions
+    employee_contribution <- current_salary * 0.035
+    employer_contribution <- current_salary * employer_contribution_rate
+    total_contribution <- employee_contribution + employer_contribution
+    account_balance <- account_balance * (1 + market_return) + total_contribution
+    
+    # Debug: Print yearly contributions and account balance
+    print(paste("Year:", year, "Employee Contribution:", employee_contribution, 
+                "Employer Contribution:", employer_contribution, 
+                "Account Balance:", account_balance))
+  }
+  
+  # Monthly withdrawal
+  monthly_withdrawal <- account_balance * withdrawal_rate / 12
+  return(monthly_withdrawal)
+}
+
+```
+
+### Final Results: 
+
+\# Install and load gt if necessary
+
+if (!requireNamespace("gt", quietly = TRUE)) #install.packages("gt")
+
+library(gt)
+
+\# Display income table
+
+income_table %\>%
+
+gt() %\>%
+
+tab_header(
+
+title = "First Month Retirement Income",
+
+subtitle = "Comparison of TRS and ORP"
+
+)
+
+```{r}
+# Calculate TRS income
+trs_income <- {
+  monthly_pension <- trs_calculation(
+    starting_salary = starting_salary,
+    wage_data = wage_data,
+    inflation_data = inflation_data,
+    years_of_service = working_time_yr
+  )
+  monthly_pension
+}
+
+# Calculate ORP income
+orp_income <- orp_calculation(
+  starting_salary = starting_salary,
+  wage_data = wage_data,
+  us_total_returns_data = us_total_returns_data,
+  bond_total_returns_data = bond_total_returns_data,
+  years_of_service = working_time_yr
+)
+
+
+
+# Install and load gt if necessary
+if (!requireNamespace("gt", quietly = TRUE)) {
+  install.packages("gt")
+}
+library(gt)
+
+# Create the income_table data frame (ensure this is defined before this step)
+income_table <- data.frame(
+  Plan = c("TRS", "ORP"),
+  First_Month_Retirement_Income = c(round(trs_income, 2), round(orp_income, 2)) # Replace these with your actual results
+)
+
+# Display income table
+income_table %>%
+  gt() %>%
+  tab_header(
+    title = "First Month Retirement Income",
+    subtitle = "Comparison of TRS and ORP"
+  )
+
+
+
+
+
+```
+
+# Task 6: Long-Term Average Analysis 
