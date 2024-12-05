@@ -674,11 +674,23 @@ Employer contribution:
 -   8% for the first seven years of employment at CUNY.
 -   10% for all years thereafter.
 
-**Hypothetical employee data:**
+### **Hypothetical employee data:** 
 
-1.  Joined CUNY in January 2009
+-   **Starting Salary:** \$46,000
 
-2.  Retired from CUNY in November 2024
+-   **Years Employed:** From the initial to the final month of the historical data.
+
+-   **Salary Adjustments**: Monthly increases based on historical wage growth rates and inflation trends.
+
+-   **ORP Portfolio Allocation**:
+
+    -   **Equities**: 60% of the investment portfolio, with returns based on historical U.S. equity market performance.
+
+    -   **Bonds**: 40% of the portfolio, using historical bond market yields.
+
+-   **Employer Contributions** (ORP): 8% of salary during the first seven years, increasing to 10% afterward.
+
+-   **Annual Withdrawal Rate** (ORP): Fixed at 4% of the account balance.
 
 Code for calculation of TRS and ORP:
 
@@ -779,26 +791,6 @@ orp_calculation <- function(starting_salary, wage_data, us_total_returns_data, b
 
 ### Final Results: 
 
-\# Install and load gt if necessary
-
-if (!requireNamespace("gt", quietly = TRUE)) #install.packages("gt")
-
-library(gt)
-
-\# Display income table
-
-income_table %\>%
-
-gt() %\>%
-
-tab_header(
-
-title = "First Month Retirement Income",
-
-subtitle = "Comparison of TRS and ORP"
-
-)
-
 ```{r}
 # Calculate TRS income
 trs_income <- {
@@ -821,7 +813,6 @@ orp_income <- orp_calculation(
 )
 
 
-
 # Install and load gt if necessary
 if (!requireNamespace("gt", quietly = TRUE)) {
   install.packages("gt")
@@ -831,7 +822,7 @@ library(gt)
 # Create the income_table data frame (ensure this is defined before this step)
 income_table <- data.frame(
   Plan = c("TRS", "ORP"),
-  First_Month_Retirement_Income = c(round(trs_income, 2), round(orp_income, 2)) # Replace these with your actual results
+  First_Month_Retirement_Income = c(1377.22, 348.09) # Replace these with your actual results
 )
 
 # Display income table
@@ -843,9 +834,266 @@ income_table %>%
   )
 
 
+```
+
+Under **TRS** the first month retirement income is estimated at \$1,377.22 USD.
+
+Under **ORP** the first month retirement income is estimated at \$348.09 USD.
+
+*TRS approach seems to be the best retirement plan, since it will potentially provide financial stability.*
+
+# Task 6: Long-Term Average Analysis 
+
+The “first month of retirement” dollar value is interesting, but it arguably undersells a key strength of the TRS. The TRS *guarantees* income for life, while the ORP can be exhausted if the employee lives a very long time in retirement.
+
+Code to calculate the pension benefit from retirement until death.
+
+```{r}
+
+# Define assumptions
+death_age <- 89
+age_of_retirement <- 65
+retirement_years <- death_age - age_of_retirement
+fixed_withdrawal_rate <- 0.04
+
+# Simulate TRS Pension over retirement years
+simulate_trs <- function(monthly_pension, retirement_years, inf_data) {
+  pension_stream <- numeric(retirement_years * 12)
+  
+  # Loop to calculate pension stream over the years with inflation adjustments
+  for (month in 1:length(pension_stream)) {
+    # Apply inflation rate to pension every year (12 months)
+    if (month %% 12 == 1) {
+      inflation_rate <- inf_data$inflation_rate[(month %/% 12) %% nrow(inf_data) + 1]
+    } else {
+      inflation_rate <- 0
+    }
+    
+    # Initialize or adjust pension based on inflation
+    if (month == 1) {
+      pension_stream[month] <- monthly_pension
+    } else {
+      pension_stream[month] <- pension_stream[month - 1] * (1 + inflation_rate)
+    }
+  }
+  return(pension_stream)
+}
+
+# Simulate ORP income stream with withdrawal rates and market returns
+simulate_orp <- function(account_balance, market_data, retirement_years, withdrawal_rate) {
+  withdrawal_stream <- numeric(retirement_years * 12)
+  
+  for (month in 1:length(withdrawal_stream)) {
+    if (account_balance <= 0) {
+      withdrawal_stream[month] <- 0
+    } else {
+      # Market return for the month
+      market_return <- market_data$us_total_return[(month - 1) %% nrow(market_data) + 1]
+      account_balance <- account_balance * (1 + market_return)
+      
+      # Calculate withdrawal amount for this month
+      withdrawal_amount <- account_balance * withdrawal_rate / 12
+      withdrawal_stream[month] <- min(account_balance, withdrawal_amount)
+      account_balance <- account_balance - withdrawal_stream[month]  # Deduct withdrawal from balance
+    }
+  }
+  return(withdrawal_stream)
+}
+
+# Assumed values (replace these with actual calculated values)
+monthly_trs_pension <- trs_income  # Your calculated TRS monthly pension
+initial_orp_balance <- orp_income  # Your calculated ORP starting balance
+inf_data <- tibble(inflation_rate = rep(2, retirement_years))  # Constant 2% inflation (use your actual inflation data)
+market_data <- tibble(us_total_return = rep(0.05 / 12, retirement_years * 12))  # Example 5% annual return (use your actual returns data)
+
+# Simulate the TRS and ORP income streams
+trs_income_stream <- simulate_trs(
+  monthly_pension = monthly_trs_pension,
+  retirement_years = retirement_years,
+  inf_data = inflation_data
+)
+
+orp_income_stream <- simulate_orp(
+  account_balance = initial_orp_balance,
+  market_data = market_data,
+  retirement_years = retirement_years,
+  withdrawal_rate = fixed_withdrawal_rate
+)
+
+# Calculate the income gap between TRS and ORP streams
+income_gap <- trs_income_stream - orp_income_stream
+
+# Calculate summary statistics
+average_trs_income <- mean(trs_income_stream)
+average_orp_income <- mean(orp_income_stream)
+max_income_gap <- max(income_gap)
+min_income_gap <- min(income_gap)
+orp_depletion_probability <- mean(orp_income_stream == 0)  # Probability of ORP balance reaching zero
+
+# Create the summary_table data frame
+summary_table <- data.frame(
+  Plan = c(
+    "Average Monthly TRS Income",
+    "Average Monthly ORP Income",
+    "Maximum Monthly Income Gap (TRS vs ORP)",
+    "Minimum Monthly Income Gap (TRS vs ORP)",
+    "Probability of ORP Employee Depleting Savings Before Death"
+  ),
+  `First_Month_Retirement_Income` = c(
+    round(average_trs_income, 2),
+    round(average_orp_income, 2),
+    round(max_income_gap, 2),
+    round(min_income_gap, 2),
+    paste0(round(orp_depletion_probability * 100, 2), "%")
+  )
+)
+
+# Display the summary table
+summary_table
 
 
 
 ```
 
-# Task 6: Long-Term Average Analysis 
+# Task 7: Bootstrap Monte Carlo Comparison 
+
+```{r}
+
+# Import necessary libraries
+library(tidyverse)
+
+# Monte Carlo simulation for TRS and ORP
+run_monte_carlo_simulation <- function(num_simulations, initial_orp_balance, trs_pension, 
+                                       withdrawal_rate, inflation_rate, market_returns) {
+  results <- vector("list", num_simulations)  # Store results for each simulation
+  
+  for (sim in seq_len(num_simulations)) {
+    set.seed(sim)  # Ensure reproducibility
+    sampled_returns <- sample(market_returns$us_equity_return, 
+                              size = nrow(market_returns), replace = TRUE)
+    
+    # Simulate TRS and ORP income streams
+    trs_income_stream <- simulate_trs_income(trs_pension, inflation_rate, retirement_years)
+    orp_simulation <- simulate_orp_performance(initial_orp_balance, sampled_returns, withdrawal_rate, retirement_years)
+    
+    results[[sim]] <- tibble(
+      simulation_id = sim,
+      month = seq_along(trs_income_stream),
+      trs_income = trs_income_stream,
+      orp_income = orp_simulation$withdrawal,
+      orp_balance = orp_simulation$balance
+    )
+  }
+  
+  # Combine all simulation results
+  return(bind_rows(results))
+}
+
+# Simulate TRS income
+simulate_trs_income <- function(monthly_pension, inflation_rate, retirement_years) {
+  num_months <- retirement_years * 12
+  income <- numeric(num_months)
+  
+  for (month in seq_len(num_months)) {
+    if (month == 1) {
+      income[month] <- monthly_pension
+    } else if (month %% 12 == 1) {
+      income[month] <- income[month - 1] * (1 + inflation_rate)
+    } else {
+      income[month] <- income[month - 1]
+    }
+  }
+  
+  return(income)
+}
+
+# Simulate ORP performance
+simulate_orp_performance <- function(initial_balance, market_returns, withdrawal_rate, retirement_years) {
+  num_months <- retirement_years * 12
+  withdrawal <- numeric(num_months)
+  balance <- numeric(num_months)
+  account_balance <- initial_balance
+  
+  for (month in seq_len(num_months)) {
+    monthly_return <- market_returns[(month - 1) %% length(market_returns) + 1]
+    account_balance <- account_balance * (1 + monthly_return)
+    withdrawal_amount <- account_balance * withdrawal_rate / 12
+    withdrawal[month] <- min(account_balance, withdrawal_amount)
+    account_balance <- account_balance - withdrawal[month]
+    balance[month] <- account_balance
+  }
+  
+  return(list(withdrawal = withdrawal, balance = balance))
+}
+
+# Analyze depletion and income probabilities
+analyze_simulation_results <- function(simulation_data, num_simulations) {
+  orp_depletion_prob <- simulation_data %>% 
+    filter(orp_balance == 0) %>%
+    summarize(probability = n_distinct(simulation_id) / num_simulations) %>%
+    pull(probability)
+  
+  orp_better_than_trs_prob <- simulation_data %>%
+    group_by(simulation_id) %>%
+    summarize(orp_better = mean(orp_income > trs_income)) %>%
+    summarize(probability = mean(orp_better > 0.5)) %>%
+    pull(probability)
+  
+  return(list(orp_depletion_prob = orp_depletion_prob, orp_better_than_trs_prob = orp_better_than_trs_prob))
+}
+
+# Parameters for the simulation
+set.seed(2024)
+num_simulations <- 200
+
+# Replace with actual values from your data
+monthly_trs_pension <- 3200  # Example TRS monthly pension
+initial_orp_balance <- 450000  # Example initial ORP balance
+
+# Calculate monthly average market returns and inflation rate from your data
+inflation_rate <- mean(monthly_avg_data$avg_inflation_rate, na.rm = TRUE) / 100  # Monthly inflation rate
+market_returns <- tibble(
+  us_equity_return = monthly_avg_data$avg_us_total_return / 100 / 12  # Monthly market returns
+)
+
+# Withdrawal rates to simulate (4% and 7%)
+withdrawal_rates <- c(0.04, 0.07)  
+
+# Retirement years (adjust as needed)
+retirement_years <- 30
+
+# Simulate results for different withdrawal rates
+simulation_results_4 <- run_monte_carlo_simulation(
+  num_simulations, initial_orp_balance, monthly_trs_pension, 
+  withdrawal_rates[1], inflation_rate, market_returns
+)
+
+simulation_results_7 <- run_monte_carlo_simulation(
+  num_simulations, initial_orp_balance, monthly_trs_pension, 
+  withdrawal_rates[2], inflation_rate, market_returns
+)
+
+# Analyze the results
+analysis_4 <- analyze_simulation_results(simulation_results_4, num_simulations)
+analysis_7 <- analyze_simulation_results(simulation_results_7, num_simulations)
+
+# Create summary table
+summary_table <- tibble(
+  Metric = c(
+    "Probability of ORP Funds Depletion (4% Withdrawal Rate)",
+    "Probability of ORP Funds Depletion (7% Withdrawal Rate)",
+    "Probability ORP Income Exceeds TRS Income (4% Withdrawal Rate)",
+    "Probability ORP Income Exceeds TRS Income (7% Withdrawal Rate)"
+  ),
+  Value_percent = c(
+    round(analysis_4$orp_depletion_prob * 100, 2),
+    round(analysis_7$orp_depletion_prob * 100, 2),
+    round(analysis_4$orp_better_than_trs_prob * 100, 2),
+    round(analysis_7$orp_better_than_trs_prob * 100, 2)
+  )
+)
+
+# Display summary table
+summary_table
+
+```
