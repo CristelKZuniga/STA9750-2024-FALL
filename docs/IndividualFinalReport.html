@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Cristel Zuniga">
+
+<title>Individual Final Report: Analyzing Airbnb Market Trends for NYC in 2019 and 2023 – STA 9750 2024 Submission Material</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">STA 9750 2024 Submission Material</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Individual Final Report: Analyzing Airbnb Market Trends for NYC in 2019 and 2023</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Cristel Zuniga </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This project is presented by the <strong>Listing Legends</strong> team. We decided to analyze Airbnb trends because we heard news about new laws being applied to listings in New York, which we found interesting since New York is one of the top tourist attractions in the world. Additionally, we discovered an interesting fact from <a href="https://www.biggerpockets.com/blog/10-airbnb-facts-didnt-know">10 Fun Facts You Didn’t Know</a>: in 2020, when COVID-19 first started, the Airbnb business declined significantly, but within two months, its business model rebounded, proving its adaptability to new travel trends.</p>
+<p>In this report you will find information related with one of the specific question: <strong>Length of stay effect on the listing price and reviews.</strong></p>
+<p><img src="airbnb.jpg" class="img-fluid" width="455"></p>
+<section id="installing-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="installing-libraries">Installing libraries</h2>
+<p>First, let’s start by gathering all the necessary libraries for Analysis and visualization.</p>
+<details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repos =</span> <span class="fu">c</span>(<span class="at">CRAN =</span> <span class="st">"https://cloud.r-project.org"</span>))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"dplyr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Installing package into 'C:/Users/krisf/AppData/Local/R/win-library/4.4'
+(as 'lib' is unspecified)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>package 'dplyr' successfully unpacked and MD5 sums checked</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: cannot remove prior installation of package 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in file.copy(savedcopy, lib, recursive = TRUE): problem copying
+C:\Users\krisf\AppData\Local\R\win-library\4.4\00LOCK\dplyr\libs\x64\dplyr.dll
+to C:\Users\krisf\AppData\Local\R\win-library\4.4\dplyr\libs\x64\dplyr.dll:
+Permission denied</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: restored 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+The downloaded binary packages are in
+    C:\Users\krisf\AppData\Local\Temp\RtmpkXqJgT\downloaded_packages</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tidyr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Installing package into 'C:/Users/krisf/AppData/Local/R/win-library/4.4'
+(as 'lib' is unspecified)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>package 'tidyr' successfully unpacked and MD5 sums checked</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: cannot remove prior installation of package 'tidyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in file.copy(savedcopy, lib, recursive = TRUE): problem copying
+C:\Users\krisf\AppData\Local\R\win-library\4.4\00LOCK\tidyr\libs\x64\tidyr.dll
+to C:\Users\krisf\AppData\Local\R\win-library\4.4\tidyr\libs\x64\tidyr.dll:
+Permission denied</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: restored 'tidyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+The downloaded binary packages are in
+    C:\Users\krisf\AppData\Local\Temp\RtmpkXqJgT\downloaded_packages</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"caret"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Installing package into 'C:/Users/krisf/AppData/Local/R/win-library/4.4'
+(as 'lib' is unspecified)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  There is a binary version available but the source version is later:
+      binary source needs_compilation
+caret 6.0-94  7.0-1              TRUE
+
+  Binaries will be installed
+package 'caret' successfully unpacked and MD5 sums checked</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: cannot remove prior installation of package 'caret'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in file.copy(savedcopy, lib, recursive = TRUE): problem copying
+C:\Users\krisf\AppData\Local\R\win-library\4.4\00LOCK\caret\libs\x64\caret.dll
+to C:\Users\krisf\AppData\Local\R\win-library\4.4\caret\libs\x64\caret.dll:
+Permission denied</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: restored 'caret'</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+The downloaded binary packages are in
+    C:\Users\krisf\AppData\Local\Temp\RtmpkXqJgT\downloaded_packages</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'caret' was built under R version 4.4.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ggplot2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lattice</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+</section>
+<section id="downloading-nyc-databases-for-2019-and-2023." class="level2">
+<h2 class="anchored" data-anchor-id="downloading-nyc-databases-for-2019-and-2023.">Downloading NYC databases for 2019 and 2023.</h2>
+<p>Datasets were sourced from <em>Kaggle.</em></p>
+<p><a href="https://drive.google.com/file/d/1H9bgJZVhN8Y5orbzU4wSWMKJf7YE474W/view?usp=drive_link">NYC Airbnb 2019</a></p>
+<p><a href="https://drive.google.com/file/d/1_bBBjZ5_Rmj21wsMvzEFveNzhhNsD3Qs/view?usp=drive_link">NYC Airbnb 2023</a></p>
+<p>Databases are stored in Google Drive, and we are using the google drive package for authentication and connection to the account, as well as downloading the databases.</p>
+<details>
+<summary>
+Initial code to download the databases
+</summary>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install and load the googledrive package if not already installed</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"googledrive"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">"googledrive"</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(googledrive)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Authenticate and connect to Google Drive</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="fu">drive_auth</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Using an auto-discovered, cached token.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  To suppress this message, modify your code or options to clearly consent to
+  the use of a cached token.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  See gargle's "Non-interactive auth" vignette for more details:</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  &lt;https://gargle.r-lib.org/articles/non-interactive-auth.html&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ The googledrive package is using a cached token for 'kasxiom@gmail.com'.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the file ID from the Google Drive link</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>file_id <span class="ot">&lt;-</span> <span class="st">"1H9bgJZVhN8Y5orbzU4wSWMKJf7YE474W"</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Download the file from Google Drive</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">drive_download</span>(<span class="fu">as_id</span>(file_id), <span class="at">path =</span> <span class="st">"NYC-Airbnb-2019.csv"</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>File downloaded:</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• 'NYC-Airbnb-2019.csv' &lt;id: 1H9bgJZVhN8Y5orbzU4wSWMKJf7YE474W&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Saved locally as:</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• 'NYC-Airbnb-2019.csv'</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>df_2019 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"NYC-Airbnb-2019.csv"</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    id                                             name host_id   host_name
+1 2539               Clean &amp; quiet apt home by the park    2787        John
+2 2595                            Skylit Midtown Castle    2845    Jennifer
+3 3647              THE VILLAGE OF HARLEM....NEW YORK !    4632   Elisabeth
+4 3831                  Cozy Entire Floor of Brownstone    4869 LisaRoxanne
+5 5022 Entire Apt: Spacious Studio/Loft by central park    7192       Laura
+6 5099        Large Cozy 1 BR Apartment In Midtown East    7322       Chris
+  neighbourhood_group neighbourhood latitude longitude       room_type price
+1            Brooklyn    Kensington 40.64749 -73.97237    Private room   149
+2           Manhattan       Midtown 40.75362 -73.98377 Entire home/apt   225
+3           Manhattan        Harlem 40.80902 -73.94190    Private room   150
+4            Brooklyn  Clinton Hill 40.68514 -73.95976 Entire home/apt    89
+5           Manhattan   East Harlem 40.79851 -73.94399 Entire home/apt    80
+6           Manhattan   Murray Hill 40.74767 -73.97500 Entire home/apt   200
+  minimum_nights number_of_reviews last_review reviews_per_month
+1              1                 9  2018-10-19              0.21
+2              1                45  2019-05-21              0.38
+3              3                 0                            NA
+4              1               270  2019-07-05              4.64
+5             10                 9  2018-11-19              0.10
+6              3                74  2019-06-22              0.59
+  calculated_host_listings_count availability_365
+1                              6              365
+2                              2              355
+3                              1              365
+4                              1              194
+5                              1                0
+6                              1              129</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(df_2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Authenticate and connect to Google Drive</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">drive_auth</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Using an auto-discovered, cached token.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  To suppress this message, modify your code or options to clearly consent to
+  the use of a cached token.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  See gargle's "Non-interactive auth" vignette for more details:</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  &lt;https://gargle.r-lib.org/articles/non-interactive-auth.html&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ The googledrive package is using a cached token for 'kasxiom@gmail.com'.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the file ID from the Google Drive link</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>file_id <span class="ot">&lt;-</span> <span class="st">"1_bBBjZ5_Rmj21wsMvzEFveNzhhNsD3Qs"</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Download the file from Google Drive</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="fu">drive_download</span>(<span class="fu">as_id</span>(file_id), <span class="at">path =</span> <span class="st">"NYC-Airbnb-2023.csv"</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>File downloaded:</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• 'NYC-Airbnb-2023.csv' &lt;id: 1_bBBjZ5_Rmj21wsMvzEFveNzhhNsD3Qs&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Saved locally as:</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• 'NYC-Airbnb-2023.csv'</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>df_2023 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"NYC-Airbnb-2023.csv"</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(df_2023)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+</section>
+<section id="cleaning-and-pre-processingin-this-step-we-ensured-all-missing-values-were-removed-from-both-databases." class="level2">
+<h2 class="anchored" data-anchor-id="cleaning-and-pre-processingin-this-step-we-ensured-all-missing-values-were-removed-from-both-databases.">Cleaning and Pre processingIn this step, we ensured all missing values were removed from both databases.</h2>
+<p>I also hot-coded dummy variables using the <code>dummyVars</code> function. This was applied to <em>Room Type</em> and <em>Neighborhood Group</em> to allow flexibility in analyzing these groups independently.</p>
+<p>Next, we removed outliers to ensure the analysis was not skewed by extreme values that might not represent typical trends or behaviors in the dataset. For example, in the case of the variable <em>price</em>, outliers could distort averages and lead to misleading conclusions about standard pricing patterns.</p>
+<p>Lastly, we renamed all the columns to ensure the plots and tables are displayed in a clear and organized format.</p>
+<details>
+<summary>
+Handle missing values
+</summary>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>df_2019 <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">reviews_per_month =</span> <span class="fu">coalesce</span>(reviews_per_month, <span class="dv">0</span>),</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_review =</span> <span class="fu">coalesce</span>(last_review, <span class="st">'0'</span>)  <span class="co"># Replace NA with a string '0'</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>df_2023 <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">reviews_per_month =</span> <span class="fu">coalesce</span>(reviews_per_month, <span class="dv">0</span>),</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_review =</span> <span class="fu">coalesce</span>(last_review, <span class="st">'0'</span>)  <span class="co"># Replace NA with a string '0'</span></span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<summary>
+Encoding Categorical Columns
+</summary>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#2019 Database</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform one-hot encoding without dropping any levels</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>dummy <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(<span class="sc">~</span> room_type <span class="sc">+</span> neighbourhood_group, <span class="at">data =</span> df_2019)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the transformation</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>df_ohe1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(dummy, <span class="at">newdata =</span> df_2019)</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to a data frame</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>df_ohe1 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(df_ohe1)</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the encoded columns with the original data</span></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>df2_2019 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(df_2019, df_ohe1)</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that all levels, including 'Bronx', are present</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_ohe1)</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the original dataframe with the encoded columns</span></span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>df_2019 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(df_2019, df_ohe1)</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the unencoded columns ('room_type' and 'neighbourhood_group')</span></span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>df_2019 <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span></span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>room_type, <span class="sc">-</span>neighbourhood_group)</span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows of the updated dataframe</span></span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_2019)</span>
+<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a><span class="co">#2023 Database</span></span>
+<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform one-hot encoding without dropping any levels</span></span>
+<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a>dummy2 <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(<span class="sc">~</span> room_type <span class="sc">+</span> neighbourhood_group, <span class="at">data =</span> df_2023)</span>
+<span id="cb58-27"><a href="#cb58-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the transformation</span></span>
+<span id="cb58-28"><a href="#cb58-28" aria-hidden="true" tabindex="-1"></a>df_ohe2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(dummy2, <span class="at">newdata =</span> df_2023)</span>
+<span id="cb58-29"><a href="#cb58-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to a data frame</span></span>
+<span id="cb58-30"><a href="#cb58-30" aria-hidden="true" tabindex="-1"></a>df_ohe2 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(df_ohe2)</span>
+<span id="cb58-31"><a href="#cb58-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the encoded columns with the original data</span></span>
+<span id="cb58-32"><a href="#cb58-32" aria-hidden="true" tabindex="-1"></a>df2_2023 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(df_2023, df_ohe2)</span>
+<span id="cb58-33"><a href="#cb58-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that all levels, including 'Bronx', are present</span></span>
+<span id="cb58-34"><a href="#cb58-34" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_ohe2)</span>
+<span id="cb58-35"><a href="#cb58-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-36"><a href="#cb58-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the original dataframe with the encoded columns</span></span>
+<span id="cb58-37"><a href="#cb58-37" aria-hidden="true" tabindex="-1"></a>df_2023 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(df_2023, df_ohe2)</span>
+<span id="cb58-38"><a href="#cb58-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-39"><a href="#cb58-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the unencoded columns ('room_type' and 'neighbourhood_group')</span></span>
+<span id="cb58-40"><a href="#cb58-40" aria-hidden="true" tabindex="-1"></a>df_2023 <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb58-41"><a href="#cb58-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>room_type, <span class="sc">-</span>neighbourhood_group)</span>
+<span id="cb58-42"><a href="#cb58-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-43"><a href="#cb58-43" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows of the updated dataframe</span></span>
+<span id="cb58-44"><a href="#cb58-44" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_2023)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<summary>
+Removing outliers from the price and minimum_nights.
+</summary>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co">#2019 Database</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function to remove outliers using the 3-sigma rule</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>remove_outliers <span class="ot">&lt;-</span> <span class="cf">function</span>(df, columns) {</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (col <span class="cf">in</span> columns) {</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the mean and standard deviation</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>    mean_col <span class="ot">&lt;-</span> <span class="fu">mean</span>(df[[col]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>    std_col <span class="ot">&lt;-</span> <span class="fu">sd</span>(df[[col]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define the upper and lower bounds</span></span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>    lower_bound <span class="ot">&lt;-</span> mean_col <span class="sc">-</span> <span class="dv">3</span> <span class="sc">*</span> std_col</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>    upper_bound <span class="ot">&lt;-</span> mean_col <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> std_col</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter the DataFrame to keep values within the bounds</span></span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(df[[col]] <span class="sc">&gt;=</span> lower_bound <span class="sc">&amp;</span> df[[col]] <span class="sc">&lt;=</span> upper_bound)</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the columns to clean</span></span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>columns_to_clean <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'price'</span>, <span class="st">'minimum_nights'</span>)</span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-22"><a href="#cb59-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the function to the dataset</span></span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a>df_2019 <span class="ot">&lt;-</span> <span class="fu">remove_outliers</span>(df2_2019, columns_to_clean)</span>
+<span id="cb59-24"><a href="#cb59-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-25"><a href="#cb59-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the shape of the cleaned dataset (number of rows and columns)</span></span>
+<span id="cb59-26"><a href="#cb59-26" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Original dataset shape:"</span>, <span class="fu">dim</span>(df2_2019), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb59-27"><a href="#cb59-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Cleaned dataset shape:"</span>, <span class="fu">dim</span>(df_2019), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb59-28"><a href="#cb59-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-29"><a href="#cb59-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-30"><a href="#cb59-30" aria-hidden="true" tabindex="-1"></a>df_2019 <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span></span>
+<span id="cb59-31"><a href="#cb59-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>room_type, <span class="sc">-</span>neighbourhood, <span class="sc">-</span>last_review, <span class="sc">-</span>latitude,<span class="sc">-</span>longitude,)</span>
+<span id="cb59-32"><a href="#cb59-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-33"><a href="#cb59-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Optional: View the first few rows of the cleaned data</span></span>
+<span id="cb59-34"><a href="#cb59-34" aria-hidden="true" tabindex="-1"></a><span class="co">#head(df_2019, 3)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co">#2023 Database</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function to remove outliers using the 3-sigma rule</span></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>remove_outliers2 <span class="ot">&lt;-</span> <span class="cf">function</span>(df, columns) {</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (col <span class="cf">in</span> columns) {</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the mean and standard deviation</span></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>    mean_col <span class="ot">&lt;-</span> <span class="fu">mean</span>(df[[col]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>    std_col <span class="ot">&lt;-</span> <span class="fu">sd</span>(df[[col]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define the upper and lower bounds</span></span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>    lower_bound <span class="ot">&lt;-</span> mean_col <span class="sc">-</span> <span class="dv">3</span> <span class="sc">*</span> std_col</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>    upper_bound <span class="ot">&lt;-</span> mean_col <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> std_col</span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter the DataFrame to keep values within the bounds</span></span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>    df2 <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(df[[col]] <span class="sc">&gt;=</span> lower_bound <span class="sc">&amp;</span> df[[col]] <span class="sc">&lt;=</span> upper_bound)</span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df2)</span>
+<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the columns to clean</span></span>
+<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a>columns_to_clean2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'price'</span>, <span class="st">'minimum_nights'</span>)</span>
+<span id="cb60-22"><a href="#cb60-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-23"><a href="#cb60-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the function to the dataset</span></span>
+<span id="cb60-24"><a href="#cb60-24" aria-hidden="true" tabindex="-1"></a>df_2023 <span class="ot">&lt;-</span> <span class="fu">remove_outliers2</span>(df2_2023, columns_to_clean2)</span>
+<span id="cb60-25"><a href="#cb60-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-26"><a href="#cb60-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the shape of the cleaned dataset (number of rows and columns)</span></span>
+<span id="cb60-27"><a href="#cb60-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Original dataset shape:"</span>, <span class="fu">dim</span>(df2_2023), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb60-28"><a href="#cb60-28" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Cleaned dataset shape:"</span>, <span class="fu">dim</span>(df_2023), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb60-29"><a href="#cb60-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-30"><a href="#cb60-30" aria-hidden="true" tabindex="-1"></a>df_2023 <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb60-31"><a href="#cb60-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>room_type, <span class="sc">-</span>neighbourhood, <span class="sc">-</span>last_review, <span class="sc">-</span>latitude,<span class="sc">-</span>longitude, <span class="sc">-</span>license, <span class="sc">-</span>number_of_reviews_ltm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<summary>
+Renaming the columns
+</summary>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename columns</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>df_2019 <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">No. Listings/Host</span><span class="st">`</span> <span class="ot">=</span> calculated_host_listings_count,</span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Home/Apartment</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">room_typeEntire home/apt</span><span class="st">`</span>,</span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Private Room</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">room_typePrivate room</span><span class="st">`</span>,</span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Shared Room</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">room_typeShared room</span><span class="st">`</span>,</span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bronx =</span> <span class="st">`</span><span class="at">neighbourhood_groupBronx</span><span class="st">`</span>,</span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Brooklyn =</span> <span class="st">`</span><span class="at">neighbourhood_groupBrooklyn</span><span class="st">`</span>,</span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Manhattan =</span> <span class="st">`</span><span class="at">neighbourhood_groupManhattan</span><span class="st">`</span>,</span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Queens =</span> <span class="st">`</span><span class="at">neighbourhood_groupQueens</span><span class="st">`</span>,</span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Staten Island</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">neighbourhood_groupStaten Island</span><span class="st">`</span>,</span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Airbnb Name</span><span class="st">`</span> <span class="ot">=</span> name,</span>
+<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Host ID</span><span class="st">`</span> <span class="ot">=</span> host_id,</span>
+<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Host Name</span><span class="st">`</span> <span class="ot">=</span> host_name,</span>
+<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Price =</span> price,</span>
+<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Minimum Nights</span><span class="st">`</span> <span class="ot">=</span> minimum_nights,</span>
+<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">No. Reviews</span><span class="st">`</span> <span class="ot">=</span> number_of_reviews,</span>
+<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Reviews/Month</span><span class="st">`</span> <span class="ot">=</span> reviews_per_month,</span>
+<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Availability 2019</span><span class="st">`</span> <span class="ot">=</span> availability_365</span>
+<span id="cb61-22"><a href="#cb61-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb61-23"><a href="#cb61-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-24"><a href="#cb61-24" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows to confirm the changes</span></span>
+<span id="cb61-25"><a href="#cb61-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename columns</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>df_2023 <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">No. Listings/Host</span><span class="st">`</span> <span class="ot">=</span> calculated_host_listings_count,</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Hotel Room</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">room_typeHotel room</span><span class="st">`</span>,</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Home/Apartment</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">room_typeEntire home/apt</span><span class="st">`</span>,</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Private Room</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">room_typePrivate room</span><span class="st">`</span>,</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Shared Room</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">room_typeShared room</span><span class="st">`</span>,</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bronx =</span> <span class="st">`</span><span class="at">neighbourhood_groupBronx</span><span class="st">`</span>,</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Brooklyn =</span> <span class="st">`</span><span class="at">neighbourhood_groupBrooklyn</span><span class="st">`</span>,</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Manhattan =</span> <span class="st">`</span><span class="at">neighbourhood_groupManhattan</span><span class="st">`</span>,</span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Queens =</span> <span class="st">`</span><span class="at">neighbourhood_groupQueens</span><span class="st">`</span>,</span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Staten Island</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">neighbourhood_groupStaten Island</span><span class="st">`</span>,</span>
+<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Airbnb Name</span><span class="st">`</span> <span class="ot">=</span> name,</span>
+<span id="cb62-15"><a href="#cb62-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Host ID</span><span class="st">`</span> <span class="ot">=</span> host_id,</span>
+<span id="cb62-16"><a href="#cb62-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Host Name</span><span class="st">`</span> <span class="ot">=</span> host_name,</span>
+<span id="cb62-17"><a href="#cb62-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Price =</span> price,</span>
+<span id="cb62-18"><a href="#cb62-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Minimum Nights</span><span class="st">`</span> <span class="ot">=</span> minimum_nights,</span>
+<span id="cb62-19"><a href="#cb62-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">No. Reviews</span><span class="st">`</span> <span class="ot">=</span> number_of_reviews,</span>
+<span id="cb62-20"><a href="#cb62-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Reviews/Month</span><span class="st">`</span> <span class="ot">=</span> reviews_per_month,</span>
+<span id="cb62-21"><a href="#cb62-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Availability 2023</span><span class="st">`</span> <span class="ot">=</span> availability_365</span>
+<span id="cb62-22"><a href="#cb62-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb62-23"><a href="#cb62-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-24"><a href="#cb62-24" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows to confirm the changes</span></span>
+<span id="cb62-25"><a href="#cb62-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_2023)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     id                                 Airbnb Name Host ID Host Name
+1  2595                       Skylit Midtown Castle    2845  Jennifer
+2  5121                             BlissArtsSpace!    7356     Garon
+3  5203          Cozy Clean Guest Room - Family Apt    7490 MaryEllen
+4  5178           Large Furnished Room Near B'way　    8967  Shunichi
+5  5136 Large Sunny Brooklyn Duplex, Patio + Garden    7378   Rebecca
+6 29628                     Comfortable, Sunny Room  127608     Chris
+  neighbourhood_group Price Minimum Nights No. Reviews Reviews/Month
+1           Manhattan   150             30          49          0.30
+2            Brooklyn    60             30          50          0.30
+3           Manhattan    75              2         118          0.72
+4           Manhattan    68              2         575          3.41
+5            Brooklyn   275             60           3          0.03
+6            Brooklyn    93              3         350          2.25
+  No. Listings/Host Availability 2023 Home/Apartment Hotel Room Private Room
+1                 3               314              1          0            0
+2                 2               365              0          0            1
+3                 1                 0              0          0            1
+4                 1               106              0          0            1
+5                 1               181              1          0            0
+6                 1               145              0          0            1
+  Shared Room Bronx Brooklyn Manhattan Queens Staten Island
+1           0     0        0         1      0             0
+2           0     0        1         0      0             0
+3           0     0        0         1      0             0
+4           0     0        0         1      0             0
+5           0     0        1         0      0             0
+6           0     0        1         0      0             0</code></pre>
+</div>
+</div>
+</details>
+<section id="define-the-target-variable-and-features." class="level3">
+<h3 class="anchored" data-anchor-id="define-the-target-variable-and-features.">Define the target variable and features.</h3>
+<p>To begin addressing this question, we analyzed the feature importances that most impacted the price of NYC listings in 2019 and 2023. To do this, we split the data into training sets and trained the model using tree-based methods under regression analysis.</p>
+<p>The code below shows the division of the target variables. I would like to note here that, exclusively for this analysis, we utilized Google Colab and Python as the programming language. The reason for this was that I initially attempted to run the same analysis in R Studio but was unsuccessful. Therefore, I decided to complete the task using a different programming language. Below, you will find a screenshot of the code.</p>
+<details>
+<summary>
+Code to see the target Variables
+</summary>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co">#2019 database</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the target variable</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>y_2019 <span class="ot">&lt;-</span> df_2019<span class="sc">$</span>Price</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the feature set by selecting all columns except the specified ones</span></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>X_2019 <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span></span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Price, <span class="sc">-</span><span class="st">`</span><span class="at">Airbnb Name</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Host Name</span><span class="st">`</span>)</span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the dimensions of the feature set and target variable</span></span>
+<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Feature set shape:"</span>, <span class="fu">dim</span>(X_2019), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb64-11"><a href="#cb64-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Target shape:"</span>, <span class="fu">length</span>(y_2019), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a><span class="co">#2023 database</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the target variable</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>y_2023 <span class="ot">&lt;-</span> df_2023<span class="sc">$</span>Price</span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the feature set by selecting all columns except the specified ones</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>X_2023 <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Price, <span class="sc">-</span><span class="st">`</span><span class="at">Airbnb Name</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Host Name</span><span class="st">`</span>)</span>
+<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the dimensions of the feature set and target variable</span></span>
+<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Feature set shape:"</span>, <span class="fu">dim</span>(X_2023), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Target shape:"</span>, <span class="fu">length</span>(y_2023), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Google Colabe code:</p>
+<p><img src="decisiontree.png" class="img-fluid"></p>
+</details>
+
+</section>
+</section>
+<section id="most-important-features-impacting-the-airbnb-prices-in-2019-and-2023." class="level2">
+<h2 class="anchored" data-anchor-id="most-important-features-impacting-the-airbnb-prices-in-2019-and-2023.">Most important Features impacting the Airbnb Prices in 2019 and 2023.</h2>
+<p>With this analysis, we were able to identify the features with the highest importance in the price changes for listings in 2019 and 2023.</p>
+<section id="feature-importance" class="level4">
+<h4 class="anchored" data-anchor-id="feature-importance">2019 Feature Importance</h4>
+<p><img src="Important feature 2019.png" class="img-fluid"></p>
+<p>In 2019, the price was primarily driven by the <strong>room type</strong>, followed by the <strong>location</strong>, with Airbnbs in Manhattan being the most popular. Homes and apartments were the top rental choices.</p>
+</section>
+<section id="feature-importance-1" class="level4">
+<h4 class="anchored" data-anchor-id="feature-importance-1">2023 Feature Importance</h4>
+<p><img src="important feature 2023.png" class="img-fluid"></p>
+<p>In 2023, the behavior changed as the number of reviews became a significant factor in driving rental prices. Homes and apartments remained the dominant room types, and Manhattan continued to be a prime location. However, reviews from other renters have now become very important.</p>
+<p>Two crucial factors that could have influenced this change are the 2020 global pandemic and customers’ increased search for cleaner and safer spaces. They can only corroborate this information through the ratings and reviews of previous renters. A second factor is a new law enforced last year, which prohibits owners from renting full apartments for less than 30 days in New York City.</p>
+</section>
+</section>
+<section id="analysis-4.-length-of-stay-effect-on-the-listing-price-and-reviews." class="level2">
+<h2 class="anchored" data-anchor-id="analysis-4.-length-of-stay-effect-on-the-listing-price-and-reviews.">Analysis: <strong>4. Length of stay effect on the listing price and reviews.</strong></h2>
+<p>To continue with this analysis, I aimed to demonstrate the accuracy of the previously obtained results. To achieve this, I considered various ways to cross-validate the information, such as comparing changes year-to-year or variable-to-variable.</p>
+<ul>
+<li><p>Comparison of changes in the number of minimum nights allowed between 2019 and 2023.</p></li>
+<li><p>Distribution of price changes from 2019 to 2023.</p></li>
+<li><p>Distribution of price changes, summarizing only the top 20 listings with the highest increase in minimum nights year-to-year: this provides a closer approach.</p></li>
+<li><p>Changes in the number of reviews and reviews per month from 2019 to 2023: this could offer additional insights.</p></li>
+<li><p>Correlation between price changes, number of reviews, and minimum nights.</p></li>
+</ul>
+<details>
+<summary>
+Code to merge both data-sets.
+</summary>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Assuming df_2019 and df_2023 are the two dataframes</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>merged_df <span class="ot">&lt;-</span> <span class="fu">merge</span>(df_2019, df_2023, <span class="at">by =</span> <span class="st">"Host ID"</span>, <span class="at">all =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Strip any leading/trailing spaces from column names</span></span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">trimws</span>(<span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename columns in the merged dataframe</span></span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Home/Apartment_x"</span>, <span class="st">"Home/Apartment"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Private Room_x"</span>, <span class="st">"Private Room"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Shared Room_x"</span>, <span class="st">"Shared Room"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Bronx_x"</span>, <span class="st">"Bronx"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Brooklyn_x"</span>, <span class="st">"Brooklyn"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Manhattan_x"</span>, <span class="st">"Manhattan"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-15"><a href="#cb66-15" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Queens_x"</span>, <span class="st">"Queens"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-16"><a href="#cb66-16" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"Staten Island_x"</span>, <span class="st">"Staten Island"</span>, <span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-17"><a href="#cb66-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-18"><a href="#cb66-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the updated column names</span></span>
+<span id="cb66-19"><a href="#cb66-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">colnames</span>(merged_df))</span>
+<span id="cb66-20"><a href="#cb66-20" aria-hidden="true" tabindex="-1"></a><span class="co">#head(merged_df)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the change in availability between 2023 and 2019</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>merged_df<span class="sc">$</span>availability_change <span class="ot">&lt;-</span> merged_df<span class="sc">$</span><span class="st">`</span><span class="at">Availability 2023</span><span class="st">`</span> <span class="sc">-</span> merged_df<span class="sc">$</span><span class="st">`</span><span class="at">Availability 2019</span><span class="st">`</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the first few rows to check the result</span></span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merged_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+<section id="change-comparison-on-the-number-on-minimum-number-of-nights-allowed-in-2019-and-2023." class="level3">
+<h3 class="anchored" data-anchor-id="change-comparison-on-the-number-on-minimum-number-of-nights-allowed-in-2019-and-2023.">Change comparison on the Number on minimum number of nights allowed in 2019 and 2023.</h3>
+<p>In this approach, I extracted the target columns for analysis from both datasets and merged them. I then calculated the number of days with an increase or decrease in the minimum nights for hosts who were registered in 2019 and remained active in 2023. Next, I classified these values into bins of 10 days each. Finally, I created a heatmap for better visualization.</p>
+<details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename and extract relevant columns for 2019</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>min_nights_2019 <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">Minimum Nights</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="st">`</span><span class="at">Min Nights 2019</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(<span class="st">`</span><span class="at">Minimum Nights</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename and extract relevant columns for 2023</span></span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>min_nights_2023 <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">Minimum Nights</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="st">`</span><span class="at">Min Nights 2023</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(<span class="st">`</span><span class="at">Minimum Nights</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-15"><a href="#cb68-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge both datasets</span></span>
+<span id="cb68-16"><a href="#cb68-16" aria-hidden="true" tabindex="-1"></a>merged_min_nights <span class="ot">&lt;-</span> <span class="fu">merge</span>(min_nights_2019, min_nights_2023, <span class="at">by =</span> <span class="st">"Host ID"</span>, <span class="at">all =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb68-17"><a href="#cb68-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-18"><a href="#cb68-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the difference</span></span>
+<span id="cb68-19"><a href="#cb68-19" aria-hidden="true" tabindex="-1"></a>merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span> <span class="ot">&lt;-</span> merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Min Nights 2023</span><span class="st">`</span> <span class="sc">-</span> merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Min Nights 2019</span><span class="st">`</span></span>
+<span id="cb68-20"><a href="#cb68-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-21"><a href="#cb68-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyze the results</span></span>
+<span id="cb68-22"><a href="#cb68-22" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(merged_min_nights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Host ID          Min Nights 2019  Min Nights 2023  Min Nights Change
+ Min.   :     2438   Min.   : 1.000   Min.   :  1.00   Min.   :-58.00   
+ 1st Qu.:  6501582   1st Qu.: 1.000   1st Qu.:  5.00   1st Qu.:  0.50   
+ Median : 23971160   Median : 2.333   Median : 30.00   Median : 25.00   
+ Mean   : 52742098   Mean   : 4.853   Mean   : 21.52   Mean   : 16.67   
+ 3rd Qu.: 68240110   3rd Qu.: 4.000   3rd Qu.: 30.00   3rd Qu.: 28.00   
+ Max.   :274298453   Max.   :62.000   Max.   :100.00   Max.   : 98.00   </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Count the number of unique Host IDs</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>unique_host_ids_count <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>))</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the result</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Number of unique Host IDs: %d</span><span class="sc">\n</span><span class="st">"</span>, unique_host_ids_count))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of unique Host IDs: 13985</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hosts with increased minimum nights</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>increased_min_nights <span class="ot">&lt;-</span> merged_min_nights[merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span> <span class="sc">&gt;</span> <span class="dv">0</span>, ]</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a><span class="co">#print(increased_min_nights)</span></span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Hosts with decreased minimum nights</span></span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>decreased_min_nights <span class="ot">&lt;-</span> merged_min_nights[merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span> <span class="sc">&lt;</span> <span class="dv">0</span>, ]</span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a><span class="co">#print(decreased_min_nights)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define bins for changes (10-day intervals)</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>bins <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">120</span>, <span class="dv">120</span>, <span class="at">by =</span> <span class="dv">10</span>), <span class="cn">Inf</span>)</span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define labels for bins</span></span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">120</span>, <span class="dv">110</span>, <span class="at">by =</span> <span class="dv">10</span>), <span class="st">" to "</span>, <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">110</span>, <span class="dv">120</span>, <span class="at">by =</span> <span class="dv">10</span>)),</span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"&gt; 120 days"</span>, <span class="st">"&lt; -120 days"</span></span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new column with 10-day bins</span></span>
+<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a>merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Change Group</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="fu">cut</span>(</span>
+<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a>  merged_min_nights<span class="sc">$</span><span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span>,</span>
+<span id="cb73-13"><a href="#cb73-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">breaks =</span> bins,</span>
+<span id="cb73-14"><a href="#cb73-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> labels,</span>
+<span id="cb73-15"><a href="#cb73-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
+<span id="cb73-16"><a href="#cb73-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb73-17"><a href="#cb73-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-18"><a href="#cb73-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the first few rows to check</span></span>
+<span id="cb73-19"><a href="#cb73-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merged_min_nights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Host ID Min Nights 2019 Min Nights 2023 Min Nights Change Change Group
+1    2438            45.0       45.000000          0.000000      0 to 10
+2    2571             9.0       14.000000          5.000000     10 to 20
+3    2787             1.0        5.142857          4.142857     10 to 20
+4    2845             1.0       22.333333         21.333333     30 to 40
+5    2868            29.0       30.000000          1.000000     10 to 20
+6    3647             3.5        5.000000          1.500000     10 to 20</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Group by 'Change Group' and count</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>grouped_changes <span class="ot">&lt;-</span> merged_min_nights <span class="sc">%&gt;%</span></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Change Group</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Change Group</span><span class="st">`</span>)</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a dummy column for a single-row heatmap</span></span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>grouped_changes <span class="ot">&lt;-</span> grouped_changes <span class="sc">%&gt;%</span></span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Dummy =</span> <span class="st">"Hosts"</span>)  <span class="co"># Create a dummy column for the x-axis</span></span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the heatmap with counts displayed</span></span>
+<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> grouped_changes, <span class="fu">aes</span>(<span class="at">x =</span> Dummy, <span class="at">y =</span> <span class="st">`</span><span class="at">Change Group</span><span class="st">`</span>, <span class="at">fill =</span> Count)) <span class="sc">+</span></span>
+<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> Count), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span>  <span class="co"># Add labels</span></span>
+<span id="cb75-15"><a href="#cb75-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"pink"</span>, <span class="at">high =</span> <span class="st">"purple"</span>, <span class="at">name =</span> <span class="st">"Number of Hosts"</span>) <span class="sc">+</span></span>
+<span id="cb75-16"><a href="#cb75-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb75-17"><a href="#cb75-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Heatmap of Minimum Nights Changes (2019 to 2023)"</span>,</span>
+<span id="cb75-18"><a href="#cb75-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb75-19"><a href="#cb75-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Change Group (days)"</span></span>
+<span id="cb75-20"><a href="#cb75-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb75-21"><a href="#cb75-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb75-22"><a href="#cb75-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb75-23"><a href="#cb75-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb75-24"><a href="#cb75-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb75-25"><a href="#cb75-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>)</span>
+<span id="cb75-26"><a href="#cb75-26" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="IndividualFinalReport_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</details>
+</section>
+<section id="heatmap-of-minimum-night-changes-2019---2023" class="level3">
+<h3 class="anchored" data-anchor-id="heatmap-of-minimum-night-changes-2019---2023">Heatmap of Minimum Night Changes (2019 - 2023)</h3>
+<p>Per the previous analysis, the variable “Minimum Nights” was one of the major factors in the price change in 2023. After reviewing our data, we found that the average minimum nights on Airbnb listings increased from 4.85 nights (2019) to 16.66 nights (2023). In the plot below, we can see that out of the 13,980 total listings found in both datasets, half of them increased their required minimum stay to between 30 and 40 days.</p>
+<p><img src="Heatmap1.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="price-change-distribution-of-2019-and-2023" class="level2">
+<h2 class="anchored" data-anchor-id="price-change-distribution-of-2019-and-2023">Price Change Distribution of 2019 and 2023</h2>
+<p>Now, I wanted to illustrate this change in dollars. To do this, I extracted the target variables, specifically <em>Host ID</em> and <em>Price</em>, merged them into a new dataframe, and calculated the price change percentage from 2019 to 2023, whether it was a decrease or an increase. Finally, I used a bar graph for better visualization.</p>
+<details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop duplicate Host IDs, keeping the first occurrence</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>df_2019_unique <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>df_2023_unique <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge with the merged_min_nights dataframe</span></span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>merged_min_nights <span class="ot">&lt;-</span> merged_min_nights <span class="sc">%&gt;%</span></span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(df_2019_unique, <span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">Price</span><span class="st">`</span>), <span class="at">by =</span> <span class="st">"Host ID"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Price_2019 =</span> Price) <span class="sc">%&gt;%</span></span>
+<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(df_2023_unique, <span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">Price</span><span class="st">`</span>), <span class="at">by =</span> <span class="st">"Host ID"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Price_2023 =</span> Price)</span>
+<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the price change</span></span>
+<span id="cb76-13"><a href="#cb76-13" aria-hidden="true" tabindex="-1"></a>merged_min_nights <span class="ot">&lt;-</span> merged_min_nights <span class="sc">%&gt;%</span></span>
+<span id="cb76-14"><a href="#cb76-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb76-15"><a href="#cb76-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">Price_Change =</span> Price_2023 <span class="sc">-</span> Price_2019,</span>
+<span id="cb76-16"><a href="#cb76-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Price_Change_Percent =</span> ((Price_2023 <span class="sc">-</span> Price_2019) <span class="sc">/</span> Price_2019) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb76-17"><a href="#cb76-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb76-18"><a href="#cb76-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-19"><a href="#cb76-19" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows of the resulting dataframe</span></span>
+<span id="cb76-20"><a href="#cb76-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merged_min_nights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Host ID Min Nights 2019 Min Nights 2023 Min Nights Change Change Group
+1    2438            45.0       45.000000          0.000000      0 to 10
+2    2571             9.0       14.000000          5.000000     10 to 20
+3    2787             1.0        5.142857          4.142857     10 to 20
+4    2845             1.0       22.333333         21.333333     30 to 40
+5    2868            29.0       30.000000          1.000000     10 to 20
+6    3647             3.5        5.000000          1.500000     10 to 20
+  Price_2019 Price_2023 Price_Change Price_Change_Percent
+1         95         95            0              0.00000
+2        182         99          -83            -45.60440
+3        149        199           50             33.55705
+4        225        150          -75            -33.33333
+5         60         60            0              0.00000
+6         79        169           90            113.92405</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define bins for the percentage change (e.g., -100% to 100% in 10% increments)</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>bins_percentage <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>, <span class="at">by =</span> <span class="dv">10</span>)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>labels_percentage <span class="ot">&lt;-</span> <span class="fu">paste</span>(bins_percentage[<span class="sc">-</span><span class="fu">length</span>(bins_percentage)], <span class="st">"% to "</span>, bins_percentage[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">-</span> <span class="dv">1</span>, <span class="st">"%"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Categorize into bins for price change</span></span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>merged_min_nights<span class="sc">$</span>Price_Change_Group <span class="ot">&lt;-</span> <span class="fu">cut</span>(</span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  merged_min_nights<span class="sc">$</span>Price_Change_Percent,</span>
+<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">breaks =</span> bins_percentage,</span>
+<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> labels_percentage,</span>
+<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
+<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-13"><a href="#cb78-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Group by Price Change Group and count the number of listings</span></span>
+<span id="cb78-14"><a href="#cb78-14" aria-hidden="true" tabindex="-1"></a>price_change_grouped <span class="ot">&lt;-</span> merged_min_nights <span class="sc">%&gt;%</span></span>
+<span id="cb78-15"><a href="#cb78-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Price_Change_Group) <span class="sc">%&gt;%</span></span>
+<span id="cb78-16"><a href="#cb78-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Price_Change_Group)</span>
+<span id="cb78-17"><a href="#cb78-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-18"><a href="#cb78-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting the price change distribution</span></span>
+<span id="cb78-19"><a href="#cb78-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb78-20"><a href="#cb78-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(price_change_grouped, <span class="fu">aes</span>(<span class="at">x =</span> Price_Change_Group, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb78-21"><a href="#cb78-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"purple"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb78-22"><a href="#cb78-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> n), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb78-23"><a href="#cb78-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb78-24"><a href="#cb78-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Price Change Distribution (2019 to 2023)"</span>,</span>
+<span id="cb78-25"><a href="#cb78-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Price Change Group (%)"</span>,</span>
+<span id="cb78-26"><a href="#cb78-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Listings"</span></span>
+<span id="cb78-27"><a href="#cb78-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb78-28"><a href="#cb78-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb78-29"><a href="#cb78-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb78-30"><a href="#cb78-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"gray"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="IndividualFinalReport_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</details>
+<p>The goal of this analysis is to review the change in behavior in comparison with the change in minimum nights. As we can observe, 41.77% of listings registered in 2019 and 2023 maintained almost the same price. According to previous research, the new Law 18 affected many owners monetarily, as the length of stay increased. Fewer tourists can afford a long stay, which led owners to offer slight discounts or promotions to keep their business running.</p>
+<p><img src="Price Change Distribution.png" class="img-fluid"></p>
+</section>
+<section id="top-20-listings-with-the-larger-minimum-night-change-from-2019-to-2023" class="level2">
+<h2 class="anchored" data-anchor-id="top-20-listings-with-the-larger-minimum-night-change-from-2019-to-2023">Top 20 Listings with the larger Minimum Night Change from 2019 to 2023</h2>
+<p>Now, from the previous dataframe, we selected the top 20 listings with the highest minimum night changes and created a visualization using a scatter plot. I found this type of graph very helpful because it clearly shows how the change occurred over these two years and is easy to interpret.</p>
+<details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the top 20 listings with the highest increase in minimum nights</span></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>top_50_min_nights_increase <span class="ot">&lt;-</span> merged_min_nights <span class="sc">%&gt;%</span></span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>)</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a><span class="co"># View the top 20 listings</span></span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(top_50_min_nights_increase, <span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Host ID Min Nights 2019 Min Nights 2023 Min Nights Change Change Group
+1   19703783               2             100                98   100 to 110
+2    4331864               8             100                92   100 to 110
+3  165884816               2              91                89    90 to 100
+4  183707967               2              90                88    90 to 100
+5    7159107               3              90                87    90 to 100
+6   10461612               3              90                87    90 to 100
+7   16204937               3              90                87    90 to 100
+8  120574445               3              90                87    90 to 100
+9  170071460               3              90                87    90 to 100
+10     45384              14             100                86    90 to 100
+11   9909455               4              90                86    90 to 100
+12  23212298               4              90                86    90 to 100
+13  44460139               4              90                86    90 to 100
+14  50116095               4              90                86    90 to 100
+15   2423061               5              90                85    90 to 100
+   Price_2019 Price_2023 Price_Change Price_Change_Percent Price_Change_Group
+1         160        445          285            178.12500               &lt;NA&gt;
+2         135         99          -36            -26.66667       -30% to -21%
+3         161        161            0              0.00000        -10% to -1%
+4         150         90          -60            -40.00000       -50% to -41%
+5          85        150           65             76.47059         70% to 79%
+6         160        160            0              0.00000        -10% to -1%
+7         215        180          -35            -16.27907       -20% to -11%
+8         200        175          -25            -12.50000       -20% to -11%
+9         100        100            0              0.00000        -10% to -1%
+10        240        450          210             87.50000         80% to 89%
+11         45         88           43             95.55556         90% to 99%
+12        127        194           67             52.75591         50% to 59%
+13        190         39         -151            -79.47368       -80% to -71%
+14         65         50          -15            -23.07692       -30% to -21%
+15        125        260          135            108.00000               &lt;NA&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required libraries</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a scatter plot to visualize the relationship between Minimum Nights Change and Price Change</span></span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top_50_min_nights_increase, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span>, <span class="at">y =</span> <span class="st">`</span><span class="at">Price_Change</span><span class="st">`</span>, <span class="at">color =</span> <span class="st">`</span><span class="at">Price_Change</span><span class="st">`</span>, <span class="at">size =</span> <span class="st">`</span><span class="at">Price_Change</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">10</span>)) <span class="sc">+</span>  <span class="co"># Adjust the size range for better visibility</span></span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradientn</span>(<span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"red"</span>)) <span class="sc">+</span>  <span class="co"># Coolwarm color palette approximation</span></span>
+<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Relationship Between Minimum Nights Change and Price Change"</span>,</span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Change in Minimum Nights"</span>,</span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Price Change (Monetary)"</span>,</span>
+<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Price Change (%)"</span>,</span>
+<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="st">"Price Change (%)"</span></span>
+<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb81-17"><a href="#cb81-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)  <span class="co"># Adjust legend position</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="IndividualFinalReport_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</details>
+<p>In this analysis, we selected the top 20 listings with the greatest increase in length of stay. As expected, most of the listings show a $0 change or a decrease in price.</p>
+<p><img src="top20.png" class="img-fluid"></p>
+</section>
+<section id="no.-reviews-and-reviews-per-month-change-from-2019-to-2023" class="level2">
+<h2 class="anchored" data-anchor-id="no.-reviews-and-reviews-per-month-change-from-2019-to-2023">No.&nbsp;Reviews and Reviews per Month Change from 2019 to 2023</h2>
+<p>The next approach I wanted to explore is the change in the number of reviews from one year to another, considering that factors like COVID or the new law might have an effect.</p>
+<p>Firstly, we pull the target variables and merge them into a dataframe, then we proceed to calculate the change in numbers from one year to the next. But the results didn’t go as expected, there is not a high change, my expectation was that the change was way higher.</p>
+<details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure necessary libraries are loaded</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove duplicates by Host ID in both 2019 and 2023 data frames</span></span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>df_2019_unique <span class="ot">&lt;-</span> df_2019 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>df_2023_unique <span class="ot">&lt;-</span> df_2023 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-8"><a href="#cb82-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 'No. Reviews' and 'Reviews/Month' from df_2019 and df_2023 into merged_min_nights</span></span>
+<span id="cb82-9"><a href="#cb82-9" aria-hidden="true" tabindex="-1"></a>merged_min_nights <span class="ot">&lt;-</span> merged_min_nights <span class="sc">%&gt;%</span></span>
+<span id="cb82-10"><a href="#cb82-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(df_2019_unique <span class="sc">%&gt;%</span></span>
+<span id="cb82-11"><a href="#cb82-11" aria-hidden="true" tabindex="-1"></a>              <span class="fu">select</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">No. Reviews</span><span class="st">`</span>, <span class="st">`</span><span class="at">Reviews/Month</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb82-12"><a href="#cb82-12" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="st">`</span><span class="at">No. Reviews 2019</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">No. Reviews</span><span class="st">`</span>, </span>
+<span id="cb82-13"><a href="#cb82-13" aria-hidden="true" tabindex="-1"></a>                     <span class="st">`</span><span class="at">Reviews/Month 2019</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Reviews/Month</span><span class="st">`</span>), </span>
+<span id="cb82-14"><a href="#cb82-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"Host ID"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb82-15"><a href="#cb82-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(df_2023_unique <span class="sc">%&gt;%</span></span>
+<span id="cb82-16"><a href="#cb82-16" aria-hidden="true" tabindex="-1"></a>              <span class="fu">select</span>(<span class="st">`</span><span class="at">Host ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">No. Reviews</span><span class="st">`</span>, <span class="st">`</span><span class="at">Reviews/Month</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb82-17"><a href="#cb82-17" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="st">`</span><span class="at">No. Reviews 2023</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">No. Reviews</span><span class="st">`</span>, </span>
+<span id="cb82-18"><a href="#cb82-18" aria-hidden="true" tabindex="-1"></a>                     <span class="st">`</span><span class="at">Reviews/Month 2023</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Reviews/Month</span><span class="st">`</span>), </span>
+<span id="cb82-19"><a href="#cb82-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"Host ID"</span>)</span>
+<span id="cb82-20"><a href="#cb82-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-21"><a href="#cb82-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-22"><a href="#cb82-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-23"><a href="#cb82-23" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merged_min_nights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Host ID Min Nights 2019 Min Nights 2023 Min Nights Change Change Group
+1    2438            45.0       45.000000          0.000000      0 to 10
+2    2571             9.0       14.000000          5.000000     10 to 20
+3    2787             1.0        5.142857          4.142857     10 to 20
+4    2845             1.0       22.333333         21.333333     30 to 40
+5    2868            29.0       30.000000          1.000000     10 to 20
+6    3647             3.5        5.000000          1.500000     10 to 20
+  Price_2019 Price_2023 Price_Change Price_Change_Percent Price_Change_Group
+1         95         95            0              0.00000        -10% to -1%
+2        182         99          -83            -45.60440       -50% to -41%
+3        149        199           50             33.55705         30% to 39%
+4        225        150          -75            -33.33333       -40% to -31%
+5         60         60            0              0.00000        -10% to -1%
+6         79        169           90            113.92405               &lt;NA&gt;
+  No. Reviews 2019 Reviews/Month 2019 No. Reviews 2023 Reviews/Month 2023
+1                1               0.06                1               0.02
+2               27               0.37               44               0.37
+3                9               0.21               42               0.49
+4               45               0.38               49               0.30
+5                2               0.06                2               0.03
+6               60               0.64               73               0.53</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the change in No. Reviews and Reviews/Month between 2019 and 2023</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>merged_min_nights[<span class="st">'No. Reviews Change'</span>] <span class="ot">=</span> merged_min_nights[<span class="st">'No. Reviews 2023'</span>] <span class="sc">-</span> merged_min_nights[<span class="st">'No. Reviews 2019'</span>]</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>merged_min_nights[<span class="st">'Reviews/Month Change'</span>] <span class="ot">=</span> merged_min_nights[<span class="st">'Reviews/Month 2023'</span>] <span class="sc">-</span> merged_min_nights[<span class="st">'Reviews/Month 2019'</span>]</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Optional: Calculate percentage change for No. Reviews and Reviews/Month</span></span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>merged_min_nights[<span class="st">'No. Reviews Change (%)'</span>] <span class="ot">=</span> ((merged_min_nights[<span class="st">'No. Reviews 2023'</span>] <span class="sc">-</span> merged_min_nights[<span class="st">'No. Reviews 2019'</span>]) <span class="sc">/</span> merged_min_nights[<span class="st">'No. Reviews 2019'</span>]) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>merged_min_nights[<span class="st">'Reviews/Month Change (%)'</span>] <span class="ot">=</span> ((merged_min_nights[<span class="st">'Reviews/Month 2023'</span>] <span class="sc">-</span> merged_min_nights[<span class="st">'Reviews/Month 2019'</span>]) <span class="sc">/</span> merged_min_nights[<span class="st">'Reviews/Month 2019'</span>]) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-9"><a href="#cb84-9" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows</span></span>
+<span id="cb84-10"><a href="#cb84-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merged_min_nights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Host ID Min Nights 2019 Min Nights 2023 Min Nights Change Change Group
+1    2438            45.0       45.000000          0.000000      0 to 10
+2    2571             9.0       14.000000          5.000000     10 to 20
+3    2787             1.0        5.142857          4.142857     10 to 20
+4    2845             1.0       22.333333         21.333333     30 to 40
+5    2868            29.0       30.000000          1.000000     10 to 20
+6    3647             3.5        5.000000          1.500000     10 to 20
+  Price_2019 Price_2023 Price_Change Price_Change_Percent Price_Change_Group
+1         95         95            0              0.00000        -10% to -1%
+2        182         99          -83            -45.60440       -50% to -41%
+3        149        199           50             33.55705         30% to 39%
+4        225        150          -75            -33.33333       -40% to -31%
+5         60         60            0              0.00000        -10% to -1%
+6         79        169           90            113.92405               &lt;NA&gt;
+  No. Reviews 2019 Reviews/Month 2019 No. Reviews 2023 Reviews/Month 2023
+1                1               0.06                1               0.02
+2               27               0.37               44               0.37
+3                9               0.21               42               0.49
+4               45               0.38               49               0.30
+5                2               0.06                2               0.03
+6               60               0.64               73               0.53
+  No. Reviews Change Reviews/Month Change No. Reviews Change (%)
+1                  0                -0.04               0.000000
+2                 17                 0.00              62.962963
+3                 33                 0.28             366.666667
+4                  4                -0.08               8.888889
+5                  0                -0.03               0.000000
+6                 13                -0.11              21.666667
+  Reviews/Month Change (%)
+1                -66.66667
+2                  0.00000
+3                133.33333
+4                -21.05263
+5                -50.00000
+6                -17.18750</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the scatter plot</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(merged_min_nights, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span>, <span class="at">y =</span> <span class="st">`</span><span class="at">No. Reviews Change</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span>  <span class="co"># Plot points in blue</span></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Scatter Plot of Minimum Nights Change vs Reviews Change"</span>,</span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Minimum Nights Change"</span>,</span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Review Change"</span></span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()  <span class="co"># Use a minimal theme</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="IndividualFinalReport_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</details>
+<p>Our third approach is to compare and analyze the relationship between Minimum Nights Change and the number of reviews change to determine if there is a significant correlation suggesting that changes in minimum nights directly affect the number of reviews per listing. Most data points are concentrated around zero on both axes, indicating that many listings experienced minimal or no change in either variable.</p>
+<p><img src="scaller plot.png" class="img-fluid"></p>
+</section>
+<section id="correlation-price-change-vs.-no.-reviews-minimum-nights-change" class="level2">
+<h2 class="anchored" data-anchor-id="correlation-price-change-vs.-no.-reviews-minimum-nights-change">Correlation Price Change vs.&nbsp;No.&nbsp;Reviews &amp; Minimum Nights Change</h2>
+<p>Finally, I wanted to globalize these different analyses in relation to the price (we previously did this with the Minimum Nights, but the Number of Reviews was not analyzed). So, we pulled the price change dataframe, the number of reviews, and minimum nights change dataframes, then merged them into a correlation matrix.</p>
+<details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the top 20 listings with the highest increase in minimum nights</span></span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>top_20_min_nights_increase <span class="ot">&lt;-</span> merged_min_nights <span class="sc">%&gt;%</span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Min Nights Change</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>)</span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a><span class="co"># View the top 3 of the top 20</span></span>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(top_20_min_nights_increase, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Host ID Min Nights 2019 Min Nights 2023 Min Nights Change Change Group
+1  19703783               2             100                98   100 to 110
+2   4331864               8             100                92   100 to 110
+3 165884816               2              91                89    90 to 100
+  Price_2019 Price_2023 Price_Change Price_Change_Percent Price_Change_Group
+1        160        445          285            178.12500               &lt;NA&gt;
+2        135         99          -36            -26.66667       -30% to -21%
+3        161        161            0              0.00000        -10% to -1%
+  No. Reviews 2019 Reviews/Month 2019 No. Reviews 2023 Reviews/Month 2023
+1                5               0.36                6               0.10
+2                7               0.14                8               0.09
+3               10               0.69               11               0.19
+  No. Reviews Change Reviews/Month Change No. Reviews Change (%)
+1                  1                -0.26               20.00000
+2                  1                -0.05               14.28571
+3                  1                -0.50               10.00000
+  Reviews/Month Change (%)
+1                -72.22222
+2                -35.71429
+3                -72.46377</code></pre>
+</div>
+</div>
+<div class="cell" data-fold="true">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure necessary libraries are loaded</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the correlation matrix</span></span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>correlation_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(merged_min_nights[, <span class="fu">c</span>(<span class="st">'Min Nights Change'</span>, <span class="st">'Price_Change'</span>, <span class="st">'No. Reviews Change'</span>)])</span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the correlation matrix to a long format for ggplot</span></span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>correlation_matrix_melted <span class="ot">&lt;-</span> <span class="fu">melt</span>(correlation_matrix)</span>
+<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the correlation matrix heatmap</span></span>
+<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(correlation_matrix_melted, <span class="fu">aes</span>(Var1, Var2, <span class="at">fill =</span> value)) <span class="sc">+</span></span>
+<span id="cb89-13"><a href="#cb89-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb89-14"><a href="#cb89-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, value)), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span>  <span class="co"># Add correlation values to tiles</span></span>
+<span id="cb89-15"><a href="#cb89-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">high =</span> <span class="st">"purple"</span>, <span class="at">mid =</span> <span class="st">"orange"</span>, <span class="at">midpoint =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb89-16"><a href="#cb89-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Correlation Between Minimum Nights Change, Price Change, and Reviews"</span>) <span class="sc">+</span></span>
+<span id="cb89-17"><a href="#cb89-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb89-18"><a href="#cb89-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))  <span class="co"># Rotate x-axis labels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="IndividualFinalReport_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</details>
+<p>In conclusion, the change in the length of stay has had a notable impact on rental prices, particularly in 2023. As previously discussed, 50% of the listings increased their minimum nights requirement; however, these listings did not significantly raise their prices. Instead, many owners opted to keep prices stable or slightly reduce them, despite broader economic factors such as inflation and increased tourism. This suggests a strategic decision by owners to adopt a “low price” approach to attract more customers, likely in response to new Airbnb regulations and heightened consumer sensitivity to environmental and social challenges.</p>
+<p>On the other hand, the change in the number of reviews showed only a slight increase in 2023 and did not appear to have a substantial impact on the minimum nights requirement. Ultimately, it is evident that price changes are more strongly influenced by adjustments in the Minimum Nights variable than by the number of reviews. This highlights the importance of length-of-stay policies as a key factor shaping Airbnb rental strategies in recent years.</p>
+<p><img src="Correlation minimum nights .png" class="img-fluid"></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/CristelKZuniga\.github\.io\/STA9750-2024-FALL\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
